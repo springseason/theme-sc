@@ -4,8 +4,8 @@
  * docs: https://tailwindcss.com/docs/configuration
  * default: https://github.com/tailwindcss/tailwindcss/blob/master/stubs/defaultConfig.stub.js
  */
-const path = require('path')
-let plugin = require('tailwindcss/plugin')
+const path = require('path');
+let plugin = require('tailwindcss/plugin');
 
 module.exports = {
   content: [
@@ -13,11 +13,9 @@ module.exports = {
     './sections/*.liquid',
     './snippets/*.liquid',
     './templates/*.liquid',
-    './frontend/**/*.{js,jsx,ts,tsx}'
+    './frontend/**/*.{js,jsx,ts,tsx}',
   ],
-  safelist: [
-    'skip-to-content-link'
-  ],
+  safelist: ['skip-to-content-link'],
   theme: {
     container: {
       center: true,
@@ -57,7 +55,7 @@ module.exports = {
             iframe: {
               width: '100%',
               height: '100%',
-              aspectRatio: '16/9'
+              aspectRatio: '16/9',
             },
             a: {
               color: 'var(--color-secondary-500)',
@@ -95,18 +93,19 @@ module.exports = {
           800: '#000000',
           900: '#000000',
           950: '#000000',
-        }
-      }
+        },
+      },
     },
   },
   plugins: [
     require('@tailwindcss/container-queries'),
     require('@tailwindcss/typography')({
-      className: 'rte'
+      className: 'rte',
     }),
+    require('@tailwindcss/forms'),
     plugin(function ({ addVariant }) {
       addVariant('scrolled', '.scrolled &'),
-        addVariant('mobile-menu-visible', '.mobile-menu-visible &')
+        addVariant('mobile-menu-visible', '.mobile-menu-visible &');
     }),
   ],
-}
+};
