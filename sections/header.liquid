@@ -358,7 +358,7 @@
 
       <!-- Secondary navigation -->
       {%- if section.settings.menu != blank -%}
-        <div class="bg-white">
+        <div class="color-{{ section.settings.color_scheme }}">
           <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="border-b border-gray-200">
               <div class="flex h-16 items-center justify-between">
@@ -390,7 +390,7 @@
                               -->
                               <button
                                 type="button"
-                                class="border-transparent text-gray-700 hover:text-gray-800 relative z-10 -mb-px flex items-center border-b-2 pt-px text-sm font-medium transition-colors duration-200 ease-out"
+                                class="border-transparent relative z-10 -mb-px flex items-center border-b-2 pt-px text-sm font-medium base-fade"
                                 aria-expanded="false"
                                 x-on:click="open = !open"
                               >
@@ -461,7 +461,7 @@
                         {%- else -%}
                           <a
                             href="{{ link.url }}"
-                            class="flex items-center text-sm font-medium text-gray-700 hover:text-red-800"
+                            class="flex items-center text-sm font-medium base-fade"
                           >
                             {{ link.title | escape }}
                           </a>
@@ -594,6 +594,12 @@
       "id": "menu",
       "default": "main-menu",
       "label": "Link list"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.all.colors.label",
+      "default": "default-palette"
     }
   ],
   "blocks": [

@@ -12,7 +12,8 @@
   h3 {
     @apply text-2xl font-bold;
   }
-  a {
-    @apply text-cloud-burst-500 font-bold;
+  a:hover,
+  button:hover {
+    color: rgb(var(--color-hover));
   }
 }
