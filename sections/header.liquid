@@ -155,104 +155,40 @@
       %}
     </nav>
 
-    <div class="flex items-center self-center ml-auto gap-4 xl:gap-8">
-      {% for block in section.blocks %}
-        {% case block.type %}
-          {% when 'search' %}
-            {% if settings.enable_predictive_search %}
-              <a href="{{ routes.search_url }}" class="block md:hidden [&>svg]:h-[28px]">
-                {% render 'icon-search' %}
-              </a>
-              <button
-                aria-label="search"
-                type="button"
-                class="[&>svg]:h-[28px] hidden md:block h-16"
-                @click="$store.global.isPredictiveSearchVisible = true"
-                :aria-expanded="$store.global.isPredictiveSearchVisible ? 'true' : 'false'"
-              >
-                {% render 'icon-search' %}
-              </button>
-            {% else %}
-              <a href="{{ routes.search_url }}" class="[&>svg]:h-[28px]">
-                {% render 'icon-search' %}
-              </a>
-            {% endif %}
-          {% when 'user' %}
-            {% if shop.customer_accounts_enabled %}
-              <a href="{{ routes.account_url }}" class="[&>svg]:h-[28px]">
-                {% render 'icon-user' %}
-              </a>
-            {% endif %}
-          {% when 'cart' %}
-            {%- if block.settings.select_cart_type == 'cart' -%}
-              <a
-                href="{{ routes.cart_url }}"
-                class="[&>svg]:h-[22px] [&>svg]:w-auto relative py-5 px-2"
-              >
-                {% render 'icon-cart' %}
-                <span
-                  data-ajax-cart-bind="item_count"
-                  class="text-cloud-burst-500 absolute top-[54%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-[12px]"
-                >
-                  {{- cart.item_count -}}
-                </span>
-              </a>
-            {%- else %}
-              <button
-                type="button"
-                class="[&>svg]:h-[28px] hidden md:block h-16 relative px-2"
-                x-data
-                @click="$store.global.isMinicartVisible = true"
-                aria-label="{{ block.name }}"
-                :aria-expanded="$store.global.isMinicartVisible ? 'true' : 'false'"
-              >
-                {% render 'icon-cart' %}
-                <span
-                  data-ajax-cart-bind="item_count"
-                  class="text-cloud-burst-500 absolute top-[54%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-[12px]"
-                >
-                  {{- cart.item_count -}}
-                </span>
-              </button>
-            {%- endif -%}
-        {% endcase %}
-      {% endfor %}
-    </div>
-
-  </header>
-</div>
-
-
-
-    {% comment %}
-      // Output customer login links
-
-      <ul>
-      {% if shop.customer_accounts_enabled %}
-      {% if customer %}
-      <a href="{{ routes.account_url }}">
-      {{ 'action.account' | t }}
-      </a>
-      {{ 'action.log_out' | t | customer_logout_link }}
-      {% else %}
-      {{ 'action.log_in' | t | customer_login_link }}
-      {{ 'action.register' | t | customer_register_link }}
-      {% endif %}
-      {% endif %}
-      </ul>
-    {% endcomment %}
+    <ul class="settings-menu flex items-center self-center ml-auto gap-4 xl:gap-6">
+      {%- render 'header-settings-menu' -%}
+    </ul>
   </div>
 </div>
+
+{% comment %}
+  // Output customer login links
+
+  <ul>
+  {% if shop.customer_accounts_enabled %}
+  {% if customer %}
+  <a href="{{ routes.account_url }}">
+  {{ 'action.account' | t }}
+  </a>
+  {{ 'action.log_out' | t | customer_logout_link }}
+  {% else %}
+  {{ 'action.log_in' | t | customer_login_link }}
+  {{ 'action.register' | t | customer_register_link }}
+  {% endif %}
+  {% endif %}
+  </ul>
+{% endcomment %}
 
 <style>
   header {
     background-color: {{ section.settings.color_scheme.settings.background }};
+  }
+  .header-nav {
     color: {{ section.settings.color_scheme.settings.text }};
   }
-  header button:hover, header a:hover {
+  .header-nav:hover {
     color: {{ section.settings.color_scheme.settings.hover }};
   }
-
 
   .section-header .header-logo {
     color: white;

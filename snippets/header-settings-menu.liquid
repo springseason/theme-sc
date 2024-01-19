@@ -1,0 +1,69 @@
+{% for block in section.blocks %}
+  <li
+    class="header-nav"
+    @click="
+      const target = $el.querySelector('button') || $el.querySelector('a[href]').click();
+      target?.click();
+      "
+  >
+    {% case block.type %}
+      {% when 'search' %}
+        {% if settings.enable_predictive_search %}
+          <a href="{{ routes.search_url }}" class="block md:hidden [&>svg]:h-[28px]">
+            {% render 'icon-search' %}
+          </a>
+          <button
+            aria-label="search"
+            type="button"
+            class="[&>svg]:h-[28px] hidden md:block"
+            @click="$store.global.isPredictiveSearchVisible = true"
+            :aria-expanded="$store.global.isPredictiveSearchVisible ? 'true' : 'false'"
+          >
+            {% render 'icon-search' %}
+          </button>
+        {% else %}
+          <a href="{{ routes.search_url }}" class="[&>svg]:h-[28px]">
+            {% render 'icon-search' %}
+          </a>
+        {% endif %}
+      {% when 'user' %}
+        {% if shop.customer_accounts_enabled %}
+          <a href="{{ routes.account_url }}" class="[&>svg]:h-[28px]">
+            {% render 'icon-user' %}
+          </a>
+        {% endif %}
+      {% when 'cart' %}
+        {%- if block.settings.select_cart_type == 'cart' -%}
+          <a
+            href="{{ routes.cart_url }}"
+            class="[&>svg]:h-[28px] [&>svg]:w-auto relative"
+          >
+            {% render 'icon-cart' %}
+            <span
+              data-ajax-cart-bind="item_count"
+              class="text-cloud-burst-500 absolute top-[60%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-[12px]"
+            >
+              {{- cart.item_count -}}
+            </span>
+          </a>
+        {%- else %}
+          <button
+            type="button"
+            class="[&>svg]:h-[28px] [&>svg]:w-auto block relative"
+            x-data
+            @click="$store.global.isMinicartVisible = true"
+            aria-label="{{ block.type }} toggle"
+            :aria-expanded="$store.global.isMinicartVisible ? 'true' : 'false'"
+          >
+            {% render 'icon-cart' %}
+            <span
+              data-ajax-cart-bind="item_count"
+              class="text-cloud-burst-500 absolute top-[60%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-[12px]"
+            >
+              {{- cart.item_count -}}
+            </span>
+          </button>
+        {%- endif -%}
+    {% endcase %}
+  </li>
+{% endfor %}

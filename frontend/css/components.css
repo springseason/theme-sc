@@ -10,7 +10,7 @@
     padding: 0;
     margin: -1px;
     overflow: hidden;
-    clip: rect(0,0,0,0);
+    clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border-width: 0;
   }
@@ -29,5 +29,9 @@
 
   .site-promo-bar-tw-component {
     @apply flex px-4 py-1 top-0 w-full items-center justify-center;
+  }
+
+  .header-nav {
+    @apply flex items-center px-2 cursor-pointer h-16;
   }
 }
