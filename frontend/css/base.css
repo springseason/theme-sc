@@ -1,8 +1,4 @@
 @layer base {
-  body {
-    /* apply but does not work, short pages without scroll still flickering the content width */
-    scrollbar-gutter: stable both-edges;
-  }
   html {
     -webkit-tap-highlight-color: transparent;
   }
