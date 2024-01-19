@@ -17,7 +17,7 @@
 
   .btn {
     @apply py-3 px-12 bg-indigo-900 hover:bg-cloud-burst-600 text-white rounded-full transition;
-  } 
+  }
 
   .pill-button {
     @apply bg-indigo-900 text-white px-4 rounded-lg cursor-pointer;
@@ -28,6 +28,6 @@
   }
 
   .site-promo-bar-tw-component {
-    @apply flex px-4 py-1 top-0 w-full items-center justify-center bg-woodland-500 text-white;
+    @apply flex px-4 py-1 top-0 w-full items-center justify-center;
   }
 }
