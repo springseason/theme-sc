@@ -97,11 +97,15 @@ module.exports = {
       },
     },
   },
+  corePlugins: {
+    aspectRatio: false,
+  },
   plugins: [
     require('@tailwindcss/container-queries'),
     require('@tailwindcss/typography')({
       className: 'rte',
     }),
+    require('@tailwindcss/aspect-ratio'),
     require('@tailwindcss/forms'),
     plugin(function ({ addVariant }) {
       addVariant('scrolled', '.scrolled &'),

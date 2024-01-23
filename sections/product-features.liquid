@@ -1,0 +1,90 @@
+{% schema %}
+{
+  "name": "Product Features",
+  "class": "section-product-features",
+  "tag": "section",
+  "settings": [
+    {
+      "id": "title",
+      "type": "text",
+      "label": "Section title",
+      "default": "The Fine Details"
+    },
+    {
+      "id": "description",
+      "type": "text",
+      "label": "Section description",
+      "default": "Our patented padded snack sleeve construction protects your favorite treats from getting smooshed during all-day adventures, long shifts at work, and tough travel schedules."
+    },
+    {
+      "id": "featured_image_1",
+      "type": "image_picker",
+      "label": "Image Option or Tag"
+    },
+    {
+      "id": "featured_image_1_desc",
+      "type": "text",
+      "label": "First image description",
+      "default": "The 20L model has enough space for 370 candy bars, 6 cylinders of chips, 1220 standard gumballs, or any combination of on-the-go treats that your heart desires. Yes, we did the math."
+    },
+    {
+      "id": "featured_image_2",
+      "type": "image_picker",
+      "label": "Image Option or Tag"
+    },
+    {
+      "id": "featured_image_2_desc",
+      "type": "text",
+      "label": "Second image description",
+      "default": "Up your snack organization game with multiple compartment options. The quick-access stash pouch is ready for even the most unexpected snack attacks and sharing needs."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product features"
+    }
+  ]
+}
+{% endschema %}
+
+<div class="mx-auto max-w-2xl px-4 py-24 sm:px-6 sm:py-32 lg:max-w-7xl lg:px-8">
+  <!-- Details section -->
+  <section aria-labelledby="details-heading" class="mt-10 border-t border-gray-200 px-4 py-16 sm:px-0">
+    <div class="flex flex-col items-center text-center mb-3">
+      <h2 id="details-heading" class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+        {{ section.settings.title | escape }}
+      </h2>
+      <p class="mt-3 max-w-3xl text-lg text-gray-600">
+        {{ section.settings.description }}
+      </p>
+    </div>
+
+    <div class="mt-16 grid grid-cols-1 gap-y-16 lg:grid-cols-2 lg:gap-x-8">
+      <div>
+        <div class="aspect-h-2 aspect-w-3 w-full overflow-hidden rounded-lg">
+          <img
+            src="{{  section.settings.featured_image_1.src | image_url }}"
+            alt="Drawstring top with elastic loop closure and textured interior padding."
+            class="h-full w-full object-cover object-center"
+          >
+        </div>
+        <p class="mt-8 text-base text-gray-500">
+          {{ section.settings.featured_image_1_desc | escape }}
+        </p>
+      </div>
+
+      <div>
+        <div class="aspect-h-2 aspect-w-3 w-full overflow-hidden rounded-lg">
+          <img
+            src="{{  section.settings.featured_image_2.src | image_url }}"
+            alt="Drawstring top with elastic loop closure and textured interior padding."
+            class="h-full w-full object-cover object-center"
+          >
+        </div>
+        <p class="mt-8 text-base text-gray-500">
+          {{ section.settings.featured_image_2_desc | escape }}
+        </p>
+      </div>
+    </div>
+  </section>
+</div>

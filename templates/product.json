@@ -6,9 +6,17 @@
         "picker_type": "select",
         "pdp_type": "pdp-2"
       }
+    },
+    "product_features_xWRPwe": {
+      "type": "product-features",
+      "settings": {
+        "featured_image_1": "shopify:\/\/shop_images\/sample-normal-wax.png",
+        "featured_image_2": "shopify:\/\/shop_images\/wax-special.png"
+      }
     }
   },
   "order": [
-    "main"
+    "main",
+    "product_features_xWRPwe"
   ]
 }
