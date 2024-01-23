@@ -3,7 +3,8 @@
     "main": {
       "type": "main-product",
       "settings": {
-        "picker_type": "select"
+        "picker_type": "select",
+        "pdp_type": "pdp-2"
       }
     }
   },
