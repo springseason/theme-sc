@@ -21,6 +21,34 @@
       "id": "menu_color_scheme",
       "label": "t:sections.header.settings.colors.menu.label",
       "default": "default-palette"
+    },
+    {
+      "id": "menu_type",
+      "type": "select",
+      "label": "Chose your desired menu styling",
+      "default": "mega-default",
+      "options": [
+        {
+          "value": "mega-default",
+          "label": "Default Mega menu"
+        },
+        {
+          "value": "mega-2",
+          "label": "Mega menu 2"
+        }
+      ]
+    },
+    {
+      "id": "featured_collection_1",
+      "type": "collection",
+      "label": "Select a Collection",
+      "info": "Choose a collection to reference in your section. Please pick a square sized (1:1 aspect-ratio)"
+    },
+    {
+      "id": "featured_collection_2",
+      "type": "collection",
+      "label": "Select a Collection",
+      "info": "Choose a collection to reference in your section. Please pick a square sized (1:1 aspect-ratio)"
     }
   ],
   "blocks": [
@@ -148,11 +176,21 @@
     {%- endif -%}
 
     <nav class="hidden md:block">
-      {% render 'header-menu',
-        links: section.settings.menu.links,
-        colors: section.settings.color_scheme.settings,
-        menu_colors: section.settings.menu_color_scheme.settings
-      %}
+      {% if section.settings.menu_type == 'mega-default' %}
+        {% render 'header-menu',
+          links: section.settings.menu.links,
+          colors: section.settings.color_scheme.settings,
+          menu_colors: section.settings.menu_color_scheme.settings
+        %}
+      {% elsif section.settings.menu_type == 'mega-2' %}
+        {% render 'mega-2',
+          links: section.settings.menu.links,
+          colors: section.settings.color_scheme.settings,
+          menu_colors: section.settings.menu_color_scheme.settings,
+          featured_collection_1: section.settings.featured_collection_1
+          featured_collection_2: section.settings.featured_collection_2
+        %}
+      {% endif %}
     </nav>
 
     <ul class="settings-menu flex items-center self-center ml-auto gap-4 xl:gap-6">
