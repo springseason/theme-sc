@@ -1128,13 +1128,13 @@
             <h2 id="details-heading" class="sr-only">Additional details</h2>
 
             <div class="divide-y divide-gray-200 border-t">
-              <div x-data="{ open: open }">
+              <div x-data="{ open: true }">
                 <h3>
                   <!-- Expand/collapse question button -->
                   <button
                     type="button"
                     class="group relative flex w-full items-center justify-between py-6 text-left"
-                    :class="{ 'accent-color': open, 'text-gray-900': !open }"
+                    :class="{ 'accent-color-nohover': open, 'text-gray-900': !open }"
                     aria-controls="disclosure-1"
                     aria-haspopup="true"
                     x-on:click="open = !open"
@@ -1198,8 +1198,8 @@
                   <button
                     type="button"
                     class="group relative flex w-full items-center justify-between py-6 text-left"
-                    :class="{ 'accent-color': open, 'text-gray-900': !open }"
-                    aria-controls="disclosure-1"
+                    :class="{ 'accent-color-nohover': open, 'text-gray-900': !open }"
+                    aria-controls="disclosure-2"
                     aria-haspopup="true"
                     x-on:click="open = !open"
                     :aria-expanded="open ? 'true' : 'false'"
@@ -1236,7 +1236,7 @@
                 </h3>
                 <div
                   class="prose prose-sm pb-6"
-                  id="disclosure-1"
+                  id="disclosure-2"
                   x-cloak
                   x-transition
                   x-show="open"
