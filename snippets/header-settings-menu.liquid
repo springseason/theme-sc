@@ -1,7 +1,7 @@
 <ul class="flex items-center self-center gap-4 xl:gap-6">
   {% for block in section.blocks %}
     <li
-      class="header-nav{%- if block.type == 'signin' -%}-r{% endif %}"
+      class="header-nav hover:cursor-pointer {%- if block.type == 'signin' -%}-r{% endif %}"
       @click="($el.querySelector('button') || $el.querySelector('a[href]')?.click())"
     >
       {% case block.type %}
@@ -63,6 +63,14 @@
 
         {% when 'promo-bar' %}
 
+        {% when 'currency' %}
+          <div class="px-4 py-6">
+            <a href="#" class="-m-2 flex items-center p-2">
+              {% render 'flag' %}
+              <span class="ml-3 block text-base font-medium">CAD</span>
+              <span class="sr-only">, change currency</span>
+            </a>
+          </div>
         {% when 'user' %}
           {% if customer %}
             <a href="{{ routes.account_url }}" class="[&>svg]:h-[28px]">

@@ -28,6 +28,11 @@
             "settings": {
             }
           },
+          "currency_WBPgpD": {
+            "type": "currency",
+            "settings": {
+            }
+          },
           "search_wRyn6x": {
             "type": "search",
             "settings": {
@@ -43,6 +48,7 @@
         "block_order": [
           "promo_bar_YHXfJt",
           "user_Gnq6Xp",
+          "currency_WBPgpD",
           "search_wRyn6x",
           "cart_9BQ9Hr"
         ],

@@ -1149,18 +1149,20 @@
                     class="h-full w-full object-cover object-center"
                   >
                 {% endcomment %}
-                {% assign image = product.images[2] %}
-                <img
-                  class="h-full w-full object-cover object-center"
-                  src="{{ image | image_url }}"
-                  alt="{{ image.alt }}"
-                  srcset="{{ image | image_url: width: 1000 }} 800w, {{ image | image_url: width: 1000 }} 1000w, {{ image | image_url: width: 1426 }} 1426w"
-                  sizes="(min-width: 830px) 55vw, 100vw"
-                  height="{{ image.height }}"
-                  width="{{ image.width }}"
-                  class="hidden lg:block rounded-lg"
-                  loading="eager"
-                >
+                {% if product.images.size > 0 %}
+                  {% assign image = product.images.last %}
+                  <img
+                    class="h-full w-full object-cover object-center"
+                    src="{{ image | image_url }}"
+                    alt="{{ image.alt }}"
+                    srcset="{{ image | image_url: width: 1000 }} 800w, {{ image | image_url: width: 1000 }} 1000w, {{ image | image_url: width: 1426 }} 1426w"
+                    sizes="(min-width: 830px) 55vw, 100vw"
+                    height="{{ image.height }}"
+                    width="{{ image.width }}"
+                    class="hidden lg:block rounded-lg"
+                    loading="eager"
+                  >
+                {% endif %}
               </div>
               <div class="relative mt-4">
                 <h3 class="text-sm font-medium text-gray-900">Other product title</h3>
