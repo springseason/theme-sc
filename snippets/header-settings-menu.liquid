@@ -1,7 +1,7 @@
 <ul class="flex items-center self-center gap-4 xl:gap-6">
   {% for block in section.blocks %}
     <li
-      class="header-nav hover:cursor-pointer {%- if block.type == 'signin' -%}-r{% endif %}"
+      class="header-nav{%- if block.type == 'user' -%}-r{% endif %} hover:cursor-pointer"
       @click="($el.querySelector('button') || $el.querySelector('a[href]')?.click())"
     >
       {% case block.type %}
@@ -78,17 +78,9 @@
             </a>
           {% else %}
             <div class="hidden lg:flex lg:items-center gap-4">
-              <div>
-                <a href="{{ routes.account_login_url }}" class="text-sm font-medium accent-color">Sign in</a>
-              </div>
-              <div>
-                <span class="h-6 w-px header-nav-r" aria-hidden="true">|</span>
-              </div>
-              <div>
-                <a href="{{ routes.account_register_url | escape }}" class="text-sm font-medium accent-color"
-                  >Create account</a
-                >
-              </div>
+              <a href="{{ routes.account_login_url }}" class="text-sm font-medium header-nav">Sign in</a>
+              <span class="h-6 w-px header-nav-r" aria-hidden="true">|</span>
+              <a href="{{ routes.account_register_url | escape }}" class="text-sm font-medium header-nav">Create account</a>
             </div>
           {% endif %}
         {% else %}
