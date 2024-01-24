@@ -89,7 +89,7 @@
                   {%- endfor -%}
                 </div>
                 <div class="grid grid-cols-2 gap-x-4">
-                  <div class="group relative text-sm">
+                  <div class="group relative text-sm cursor-pointer">
                     <div class="aspect-h-1 aspect-w-1 overflow-hidden rounded-lg group-hover:opacity-75">
                       <img
                         src="{{ featured_collection_1.image | image_url }}"
@@ -99,7 +99,7 @@
                         width="220"
                       >
                     </div>
-                    <a href="#" class="mt-6 block font-medium text-gray-900">
+                    <a href="#" class="mt-6 block font-medium">
                       <span class="absolute inset-0 z-10" aria-hidden="true"></span>
                       {{ featured_collection_1.title | escape }}
                     </a>
@@ -115,7 +115,7 @@
                         width="220"
                       >
                     </div>
-                    <a href="#" class="mt-6 block font-medium text-gray-900">
+                    <a href="#" class="mt-6 block font-medium">
                       <span class="absolute inset-0 z-10" aria-hidden="true"></span>
                       {{ featured_collection_2.title | escape }}
                     </a>
@@ -146,9 +146,6 @@
     align-items: center;
     padding: 0 1rem;
   }
-  .header-menu > li {
-    color: {{ colors.text }};
-  }
   .header-menu > li:hover {
     color: {{ colors.hover }};
   }
@@ -172,8 +169,5 @@
   }
   .mega-menu a:hover {
     color: {{ menu_colors.hover }};
-  }
-  .mega-menu :not(a) {
-    cursor: default;
   }
 </style>

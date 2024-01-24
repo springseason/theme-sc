@@ -32,7 +32,7 @@
   }
 
   .header-nav {
-    @apply flex items-center px-2 cursor-pointer h-16;
+    @apply flex items-center px-2 h-16;
   }
 
   .plusminus {
