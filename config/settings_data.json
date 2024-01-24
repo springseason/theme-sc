@@ -23,6 +23,11 @@
               "promo_color_scheme": "scheme-95699083-ad4e-4c38-a5dd-381441eeb341"
             }
           },
+          "user_Gnq6Xp": {
+            "type": "user",
+            "settings": {
+            }
+          },
           "search_wRyn6x": {
             "type": "search",
             "settings": {
@@ -37,6 +42,7 @@
         },
         "block_order": [
           "promo_bar_YHXfJt",
+          "user_Gnq6Xp",
           "search_wRyn6x",
           "cart_9BQ9Hr"
         ],

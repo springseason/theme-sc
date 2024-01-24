@@ -11,7 +11,7 @@
     <li
       id="{{ id }}"
       class="header-nav"
-      @click="$el.querySelector('a[href]').click()"
+      @click="$el.querySelector('a[href]')?.click()"
       {%- if link.links != blank -%}
         x-data="{ open: false }"
         @mouseenter="open = true"

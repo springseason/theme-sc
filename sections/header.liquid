@@ -128,7 +128,7 @@
 {% endfor %}
 
 <div class="px-6 md:px-8">
-  <div class="container flex items-center relative mx-auto max-h-16">
+  <div class="container flex items-center justify-between relative mx-auto max-h-16">
     {% comment %}
       <nav
         :class="$store.global.isMobileMenuVisible ? 'open' : 'closed'"
@@ -158,64 +158,45 @@
         {% render 'mobile-menu' %}
       </nav>
     {% endcomment %}
+    <div class="flex">
+      {%- if shop.brand.logo != blank -%}
+        <a href="{{ routes.root_url }}" class="p-2">
+          <span class="sr-only"></span>
+          <img
+            class="h-10 w-auto"
+            src="{{ shop.brand.logo | image_url }}"
+            alt="{{ shop.name | escape }}'s logo"
+            width="40"
+            height="40"
+            loading="eager"
+          >
+        </a>
+      {%- else -%}
+        <a href="{{ routes.root_url }}" class="header-logo">Cherry</a>
+      {%- endif -%}
 
-    {%- if shop.brand.logo != blank -%}
-      <a href="{{ routes.root_url }}" class="p-2">
-        <span class="sr-only"></span>
-        <img
-          class="h-10 w-auto"
-          src="{{ shop.brand.logo | image_url }}"
-          alt="{{ shop.name | escape }}'s logo"
-          width="40"
-          height="40"
-          loading="eager"
-        >
-      </a>
-    {%- else -%}
-      <a href="{{ routes.root_url }}" class="header-logo">Cherry</a>
-    {%- endif -%}
+      <nav class="hidden md:block">
+        {% if section.settings.menu_type == 'mega-default' %}
+          {% render 'header-menu',
+            links: section.settings.menu.links,
+            colors: section.settings.color_scheme.settings,
+            menu_colors: section.settings.menu_color_scheme.settings
+          %}
+        {% elsif section.settings.menu_type == 'mega-2' %}
+          {% render 'mega-2',
+            links: section.settings.menu.links,
+            colors: section.settings.color_scheme.settings,
+            menu_colors: section.settings.menu_color_scheme.settings,
+            featured_collection_1: section.settings.featured_collection_1,
+            featured_collection_2: section.settings.featured_collection_2
+          %}
+        {% endif %}
+      </nav>
+    </div>
 
-    <nav class="hidden md:block">
-      {% if section.settings.menu_type == 'mega-default' %}
-        {% render 'header-menu',
-          links: section.settings.menu.links,
-          colors: section.settings.color_scheme.settings,
-          menu_colors: section.settings.menu_color_scheme.settings
-        %}
-      {% elsif section.settings.menu_type == 'mega-2' %}
-        {% render 'mega-2',
-          links: section.settings.menu.links,
-          colors: section.settings.color_scheme.settings,
-          menu_colors: section.settings.menu_color_scheme.settings,
-          featured_collection_1: section.settings.featured_collection_1
-          featured_collection_2: section.settings.featured_collection_2
-        %}
-      {% endif %}
-    </nav>
-
-    <ul class="settings-menu flex items-center self-center ml-auto gap-4 xl:gap-6">
-      {%- render 'header-settings-menu' -%}
-    </ul>
+    {%- render 'header-settings-menu' -%}
   </div>
 </div>
-
-{% comment %}
-  // Output customer login links
-
-  <ul>
-  {% if shop.customer_accounts_enabled %}
-  {% if customer %}
-  <a href="{{ routes.account_url }}">
-  {{ 'action.account' | t }}
-  </a>
-  {{ 'action.log_out' | t | customer_logout_link }}
-  {% else %}
-  {{ 'action.log_in' | t | customer_login_link }}
-  {{ 'action.register' | t | customer_register_link }}
-  {% endif %}
-  {% endif %}
-  </ul>
-{% endcomment %}
 
 <style>
   header {
@@ -224,8 +205,14 @@
   .header-nav {
     color: {{ section.settings.color_scheme.settings.text }};
   }
+  .header-nav-r {
+    color: {{ section.settings.color_scheme.settings.text }};
+  }
   .header-nav:hover {
     color: {{ section.settings.color_scheme.settings.hover }};
+  }
+  .text-background {
+    color: {{ section.settings.color_scheme.settings.background }}
   }
 
   .section-header .header-logo {
