@@ -1,6 +1,6 @@
-.some-unused-class {
+/* .some-unused-class {
   --im-not-tree-shaken: 1;
-}
+} */
 
 @font-face {
   font-family: 'Open Sans';
