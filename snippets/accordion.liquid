@@ -48,39 +48,9 @@
 
 <style>
   .plusminus {
-    position: relative;
-    cursor: pointer;
-
-
-    &.active {
-      &:before {
-        transform: translatey(-50%) rotate(-90deg);
-        opacity: 0;
-      }
-      &:after {
-        transform: translatey(-50%) rotate(0);
-      }
-    }
-
     &:before,
     &:after {
-      content: '';
-      display: block;
-      position: absolute;
-      top: 50%;
-      left: 0;
-      transition: 0.35s;
-      width: 100%;
-      height: 2px;
-      background: {{ color }}
-    }
-
-    &:before {
-      transform: translatey(-50%);
-    }
-
-    &:after {
-      transform: translatey(-50%) rotate(90deg);
+      background-color: {{ color }}
     }
   }
 </style>
