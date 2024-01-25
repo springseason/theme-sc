@@ -45,7 +45,7 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        'open-sans': ['"Open Sans"', 'sans-serif'],
+        'open-sans': ['"Brown Pro"', 'sans-serif'],
       },
       typography: {
         DEFAULT: {
