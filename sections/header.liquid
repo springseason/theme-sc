@@ -5,6 +5,22 @@
   "tag": "header",
   "settings": [
     {
+      "type": "select",
+      "id": "layout",
+      "label": "Header layout selector",
+      "default": "center",
+      "options": [
+        {
+          "value": "center",
+          "label": "Logo - Menu center - Settings"
+        },
+        {
+          "value": "left",
+          "label": "Logo, Menu - Settings"
+        }
+      ]
+    },
+    {
       "type": "link_list",
       "id": "menu",
       "label": "t:sections.header.settings.links.header.label",
@@ -49,6 +65,16 @@
       "type": "collection",
       "label": "Select a Collection",
       "info": "Choose a collection to reference in your section. Please pick a square sized (1:1 aspect-ratio)"
+    },
+    {
+      "id": "settings_gap",
+      "type": "range",
+      "step": 1,
+      "min": 0,
+      "max": 6,
+      "unit": "rem",
+      "label": "Header Settings bar gap size",
+      "default": 0
     }
   ],
   "blocks": [
@@ -92,7 +118,14 @@
     {
       "name": "Currency selector",
       "type": "currency",
-      "settings": [],
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "enable_flag",
+          "label": "Display language flag",
+          "default": false
+        }
+      ],
       "limit": 1
     },
     {
@@ -134,7 +167,7 @@
 {% endfor %}
 
 <div class="px-6 md:px-8">
-  <div class="container flex items-center justify-between relative mx-auto max-h-16">
+  <div class="flex items-center relative mx-auto max-h-16">
     {% comment %}
       <nav
         :class="$store.global.isMobileMenuVisible ? 'open' : 'closed'"
@@ -164,7 +197,12 @@
         {% render 'mobile-menu' %}
       </nav>
     {% endcomment %}
-    <div class="flex">
+
+    <div
+      {% if section.settings.layout == 'center' %}
+        class="flex-1"
+      {% endif %}
+    >
       {%- if shop.brand.logo != blank -%}
         <a href="{{ routes.root_url }}" class="p-2">
           <span class="sr-only"></span>
@@ -180,7 +218,8 @@
       {%- else -%}
         <a href="{{ routes.root_url }}" class="header-logo">Cherry</a>
       {%- endif -%}
-
+    </div>
+    <div class="flex flex-1 {%- if section.settings.layout == 'center' -%}justify-center{% endif %}">
       <nav class="hidden md:block">
         {% if section.settings.menu_type == 'mega-default' %}
           {% render 'header-menu',
@@ -199,8 +238,9 @@
         {% endif %}
       </nav>
     </div>
-
-    {%- render 'header-settings-menu' -%}
+    <ul class="flex xl:gap-{{ section.settings.settings_gap }} {%- if section.settings.layout == 'center' -%}flex-1 justify-end{% endif %}">
+      {%- render 'header-settings-menu', class: 'bg-red-500' -%}
+    </ul>
   </div>
 </div>
 

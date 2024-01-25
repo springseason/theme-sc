@@ -31,6 +31,7 @@
           "currency_WBPgpD": {
             "type": "currency",
             "settings": {
+              "enable_flag": false
             }
           },
           "search_wRyn6x": {
@@ -53,12 +54,14 @@
           "cart_9BQ9Hr"
         ],
         "settings": {
+          "layout": "left",
           "menu": "main-menu",
           "color_scheme": "default-palette",
           "menu_color_scheme": "scheme-95699083-ad4e-4c38-a5dd-381441eeb341",
           "menu_type": "mega-2",
           "featured_collection_1": "hydrogen",
-          "featured_collection_2": "test-coll-2"
+          "featured_collection_2": "test-coll-2",
+          "settings_gap": 0
         }
       },
       "minicart": {
