@@ -10,13 +10,24 @@
     "product_features_xWRPwe": {
       "type": "product-features",
       "settings": {
+        "title": "The Fine Details",
+        "description": "Our patented padded snack sleeve construction protects your favorite treats from getting smooshed during all-day adventures, long shifts at work, and tough travel schedules.",
         "featured_image_1": "shopify:\/\/shop_images\/sample-normal-wax.png",
-        "featured_image_2": "shopify:\/\/shop_images\/wax-special.png"
+        "featured_image_1_desc": "The 20L model has enough space for 370 candy bars, 6 cylinders of chips, 1220 standard gumballs, or any combination of on-the-go treats that your heart desires. Yes, we did the math.",
+        "featured_image_2": "shopify:\/\/shop_images\/wax-special.png",
+        "featured_image_2_desc": "Up your snack organization game with multiple compartment options. The quick-access stash pouch is ready for even the most unexpected snack attacks and sharing needs."
+      }
+    },
+    "related_products_8tDBNH": {
+      "type": "related-products",
+      "settings": {
+        "title": "Customers also bought"
       }
     }
   },
   "order": [
     "main",
-    "product_features_xWRPwe"
+    "product_features_xWRPwe",
+    "related_products_8tDBNH"
   ]
 }

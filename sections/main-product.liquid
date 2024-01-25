@@ -48,23 +48,3 @@
     render 'pdp', colors: colors
   endif
 %}
-
-<style>
-  .accent-color-nohover {
-    color: {{ colors.text }};
-  }
-  .accent-color {
-    color: {{ colors.text }};
-    transition: color 0.3s ease;
-  }
-  .accent-color:hover {
-    color: {{ colors.hover }}
-  }
-  .accent-bg {
-    background-color: {{ colors.text }};
-    transition: background-color 0.3s ease;
-  }
-  .accent-bg:hover {
-    background-color: {{ colors.hover }}
-  }
-</style>
