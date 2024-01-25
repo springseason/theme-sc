@@ -24,9 +24,9 @@
       loading="lazy"
     >
   </div>
-  <div class="mt-4 flex items-center justify-between text-base font-medium">
-    <h3>{{ product.title }}</h3>
-    <p>{{ product.price | money }}</p>
+  <div class="mt-4 flex items-center justify-between text-base">
+    <h3 class="lowercase font-normal">{{ product.title }}</h3>
+    <p class="font-extralight">{{ product.price | money }}</p>
     {% if product.compare_at_price_max != blank and product.compare_at_price_max > product.price %}
       <s class="text-[13px] text-gray-700">{{ product.compare_at_price_max | money }}</s>
     {% endif %}
