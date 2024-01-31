@@ -62,6 +62,9 @@ module.exports = {
       },
     },
   },
+  corePlugins: {
+    aspectRatio: false,
+  },
   plugins: [
     require('@tailwindcss/container-queries'),
     require('@tailwindcss/typography')({

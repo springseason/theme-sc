@@ -1,29 +1,166 @@
 {% schema %}
-  {
-    "name": "footer",
-    "class": "footer",
-    "tag": "footer",
-    "settings": [
-      {
-        "type": "paragraph",
-        "content": "t:sections.footer.settings.paragraph"
-      }
-    ]
-  }
+{
+  "name": "footer",
+  "class": "footer",
+  "tag": "footer",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "t:sections.footer.settings.paragraph"
+    }
+  ]
+}
 {% endschema %}
 
 <div class="px-6 md:px-8 py-12">
   <div class="container">
-    {% comment %} <div>
-      {% for link in linklists.footer.links %}
-        <a href="{{ link.url }}">
-          {{ link.title }}
-        </a>
-      {% endfor %}
-    </div> {% endcomment %}
+    <h2 id="footer-heading" class="sr-only">Footer</h2>
+    <div class="lg:grid lg:grid-cols-3 lg:gap-8 py-20 link">
+      <div class="grid grid-cols-2 gap-8 col-span-2">
+        <div class="flex flex-col gap-4 md:grid md:grid-cols-2 md:gap-8 gap-y-14">
+          <div>
+            <h3 class="text-sm font-medium">Shop</h3>
+            <ul role="list" class="mt-6 gap-4 flex flex-col">
+              <li class="text-sm">
+                <a href="#">Bags</a>
+              </li>
+              <li class="text-sm">
+                <a href="#">Tees</a>
+              </li>
+              <li class="text-sm">
+                <a href="#">Objects</a>
+              </li>
+              <li class="text-sm">
+                <a href="#">Home Goods</a>
+              </li>
+              <li class="text-sm">
+                <a href="#">Accessories</a>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-sm font-medium">Company</h3>
+            <ul role="list" class="mt-6 gap-4 flex flex-col">
+              <li class="text-sm">
+                <a href="#">Who we are</a>
+              </li>
+              <li class="text-sm">
+                <a href="#">Sustainability</a>
+              </li>
+              <li class="text-sm">
+                <a href="#">Press</a>
+              </li>
+              <li class="text-sm">
+                <a href="#">Careers</a>
+              </li>
+              <li class="text-sm">
+                <a href="#">Terms &amp; Conditions</a>
+              </li>
+              <li class="text-sm">
+                <a href="#">Privacy</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="flex flex-col gap-4 md:grid md:grid-cols-2 md:gap-8 gap-y-14">
+          <div>
+            <h3 class="text-sm font-medium">Account</h3>
+            <ul role="list" class="mt-6 gap-4 flex flex-col">
+              <li class="text-sm">
+                <a href="#">Manage Account</a>
+              </li>
+              <li class="text-sm">
+                <a href="#">Returns &amp; Exchanges</a>
+              </li>
+              <li class="text-sm">
+                <a href="#">Redeem a Gift Card</a>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-sm font-medium">Connect</h3>
+            <ul role="list" class="mt-6 space-y-6">
+              <li class="text-sm">
+                <a href="#">Contact Us</a>
+              </li>
+              <li class="text-sm">
+                <a href="#">Facebook</a>
+              </li>
+              <li class="text-sm">
+                <a href="#">Instagram</a>
+              </li>
+              <li class="text-sm">
+                <a href="#">Pinterest</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="mt-16 md:mt-16 xl:mt-0">
+        <h3 class="text-sm font-medium">Sign up for our newsletter</h3>
+        <p class="mt-6 text-sm">The latest deals and savings, sent to your inbox weekly.</p>
+        <form class="mt-2 flex sm:max-w-md">
+          <label for="email-address" class="sr-only">Email address</label>
+          <input
+            id="email-address"
+            type="text"
+            autocomplete="email"
+            required
+            class="w-full min-w-0 appearance-none rounded-md border border-gray-300 bg-white px-4 py-2 text-base text-indigo-500 placeholder-gray-500 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+          >
+          <div class="ml-4 flex-shrink-0">
+            <button
+              type="submit"
+              class="flex max-w-xs flex-1 items-center justify-center rounded-md border border-transparent accent-bg px-8 py-3 text-base font-medium text-white sm:w-full"
+            >
+              Sign up
+            </button>
+          </div>
+        </form>
+      </div>
 
-    {% comment %} <small>
-      &copy; {{ "now" | date: "%Y" }} Slayed Starter Theme
-    </small> {% endcomment %}
+      {% comment %}
+        <div class="border-t border-gray-200 py-10">
+          <p class="text-sm">Copyright &copy; 2021 Your Company, Inc.</p>
+        </div>
+      {% endcomment %}
+    </div>
   </div>
 </div>
+
+{% comment %}
+  <div>
+    {% for link in linklists.footer.links %}
+      <a href="{{ link.url }}">
+        {{ link.title }}
+      </a>
+    {% endfor %}
+  </div>
+{% endcomment %}
+
+{% comment %}
+  <small>
+    &copy; {{ "now" | date: "%Y" }} Slayed Starter Theme
+  </small>
+{% endcomment %}
+{% comment %}
+  </div>
+  </div>
+{% endcomment %}
+
+{% assign colors = settings.color_schemes['default-palette'].settings %}
+<style>
+  .link li:hover {
+    color: {{ colors.hover }}
+  }
+  .link h3 {
+    font-weight: 500
+  }
+      .accent-bg {
+      background-color: {{ colors.text }};
+      transition: background-color 0.3s ease;
+    }
+    .accent-bg:hover {
+      background-color: {{ colors.hover }}
+    }
+</style>

@@ -2,7 +2,6 @@
   html {
     -webkit-tap-highlight-color: transparent;
   }
-
   h1 {
     @apply text-5xl font-bold;
   }

@@ -5,6 +5,22 @@
   "tag": "header",
   "settings": [
     {
+      "type": "select",
+      "id": "layout",
+      "label": "Header layout selector",
+      "default": "left",
+      "options": [
+        {
+          "value": "center",
+          "label": "Logo - Menu center - Settings"
+        },
+        {
+          "value": "left",
+          "label": "Logo, Menu - Settings"
+        }
+      ]
+    },
+    {
       "type": "link_list",
       "id": "menu",
       "label": "t:sections.header.settings.links.header.label",
@@ -21,6 +37,44 @@
       "id": "menu_color_scheme",
       "label": "t:sections.header.settings.colors.menu.label",
       "default": "default-palette"
+    },
+    {
+      "id": "menu_type",
+      "type": "select",
+      "label": "Chose your desired menu styling",
+      "default": "mega-default",
+      "options": [
+        {
+          "value": "mega-default",
+          "label": "Default Mega menu"
+        },
+        {
+          "value": "mega-2",
+          "label": "Mega menu 2"
+        }
+      ]
+    },
+    {
+      "id": "featured_collection_1",
+      "type": "collection",
+      "label": "Select a Collection",
+      "info": "Choose a collection to reference in your section. Please pick a square sized (1:1 aspect-ratio)"
+    },
+    {
+      "id": "featured_collection_2",
+      "type": "collection",
+      "label": "Select a Collection",
+      "info": "Choose a collection to reference in your section. Please pick a square sized (1:1 aspect-ratio)"
+    },
+    {
+      "id": "settings_gap",
+      "type": "range",
+      "step": 1,
+      "min": 0,
+      "max": 6,
+      "unit": "rem",
+      "label": "Header Settings bar gap size",
+      "default": 0
     }
   ],
   "blocks": [
@@ -62,6 +116,19 @@
       "limit": 1
     },
     {
+      "name": "Currency selector",
+      "type": "currency",
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "enable_flag",
+          "label": "Display language flag",
+          "default": false
+        }
+      ],
+      "limit": 1
+    },
+    {
       "name": "Cart",
       "type": "cart",
       "settings": [
@@ -100,7 +167,7 @@
 {% endfor %}
 
 <div class="px-6 md:px-8">
-  <div class="container flex items-center relative mx-auto max-h-16">
+  <div class="flex items-center relative mx-auto max-h-16">
     {% comment %}
       <nav
         :class="$store.global.isMobileMenuVisible ? 'open' : 'closed'"
@@ -131,53 +198,51 @@
       </nav>
     {% endcomment %}
 
-    {%- if shop.brand.logo != blank -%}
-      <a href="{{ routes.root_url }}" class="p-2">
-        <span class="sr-only"></span>
-        <img
-          class="h-10 w-auto"
-          src="{{ shop.brand.logo | image_url }}"
-          alt="{{ shop.name | escape }}'s logo"
-          width="40"
-          height="40"
-          loading="eager"
-        >
-      </a>
-    {%- else -%}
-      <a href="{{ routes.root_url }}" class="header-logo">Cherry</a>
-    {%- endif -%}
-
-    <nav class="hidden md:block">
-      {% render 'header-menu',
-        links: section.settings.menu.links,
-        colors: section.settings.color_scheme.settings,
-        menu_colors: section.settings.menu_color_scheme.settings
-      %}
-    </nav>
-
-    <ul class="settings-menu flex items-center self-center ml-auto gap-4 xl:gap-6">
-      {%- render 'header-settings-menu' -%}
+    <div
+      {% if section.settings.layout == 'center' %}
+        class="flex-1"
+      {% endif %}
+    >
+      {%- if shop.brand.logo != blank -%}
+        <a href="{{ routes.root_url }}" class="p-2">
+          <span class="sr-only"></span>
+          <img
+            class="h-10 w-auto"
+            src="{{ shop.brand.logo | image_url }}"
+            alt="{{ shop.name | escape }}'s logo"
+            width="40"
+            height="40"
+            loading="eager"
+          >
+        </a>
+      {%- else -%}
+        <a href="{{ routes.root_url }}" class="header-logo">Cherry</a>
+      {%- endif -%}
+    </div>
+    <div class="flex flex-1 {%- if section.settings.layout == 'center' -%}justify-center{% endif %}">
+      <nav class="hidden md:block">
+        {% if section.settings.menu_type == 'mega-default' %}
+          {% render 'header-menu',
+            links: section.settings.menu.links,
+            colors: section.settings.color_scheme.settings,
+            menu_colors: section.settings.menu_color_scheme.settings
+          %}
+        {% elsif section.settings.menu_type == 'mega-2' %}
+          {% render 'mega-2',
+            links: section.settings.menu.links,
+            colors: section.settings.color_scheme.settings,
+            menu_colors: section.settings.menu_color_scheme.settings,
+            featured_collection_1: section.settings.featured_collection_1,
+            featured_collection_2: section.settings.featured_collection_2
+          %}
+        {% endif %}
+      </nav>
+    </div>
+    <ul class="flex xl:gap-{{ section.settings.settings_gap }} {%- if section.settings.layout == 'center' -%}flex-1 justify-end{% endif %}">
+      {%- render 'header-settings-menu', class: 'bg-red-500' -%}
     </ul>
   </div>
 </div>
-
-{% comment %}
-  // Output customer login links
-
-  <ul>
-  {% if shop.customer_accounts_enabled %}
-  {% if customer %}
-  <a href="{{ routes.account_url }}">
-  {{ 'action.account' | t }}
-  </a>
-  {{ 'action.log_out' | t | customer_logout_link }}
-  {% else %}
-  {{ 'action.log_in' | t | customer_login_link }}
-  {{ 'action.register' | t | customer_register_link }}
-  {% endif %}
-  {% endif %}
-  </ul>
-{% endcomment %}
 
 <style>
   header {
@@ -186,8 +251,15 @@
   .header-nav {
     color: {{ section.settings.color_scheme.settings.text }};
   }
+  .header-nav-r {
+    color: {{ section.settings.color_scheme.settings.text }};
+  }
   .header-nav:hover {
     color: {{ section.settings.color_scheme.settings.hover }};
+    cursor: pointer;
+  }
+  .text-background {
+    color: {{ section.settings.color_scheme.settings.background }}
   }
 
   .section-header .header-logo {

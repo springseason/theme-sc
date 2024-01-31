@@ -1,0 +1,56 @@
+{% comment %}
+  idx
+  title
+  isDefaultExpanded
+  color // TEMP sh1t
+{% endcomment %}
+
+{% assign isDefaultExpanded = isDefaultExpanded | default: false %}
+
+<div x-data="{ expanded: {{ isDefaultExpanded }} }">
+  <h3>
+    <!-- Expand/collapse question button -->
+    <button
+      id="disclosure-{{ idx }}-title"
+      type="button"
+      class="group relative flex w-full items-center justify-between py-6 text-left"
+      x-on:click="expanded = !expanded"
+      :class="{ 'accent-color-nohover': expanded, 'text-gray-900': !expanded }"
+      aria-controls="disclosure-{{ idx }}"
+      :aria-expanded="expanded"
+    >
+      <!-- Open: "text-indigo-600", Closed: "text-gray-900" -->
+      <span class="text-sm font-medium">{{ title }}</span>
+      <span class="ml-6 flex items-center">
+        <div class="plusminus h-4 w-4" :class="expanded ? 'active': ''" x-cloak></div>
+      </span>
+    </button>
+  </h3>
+  <div
+    id="disclosure-{{ idx }}"
+    role="region"
+    aria-labelledby="product-feature-{{ idx }}"
+    class="grid overflow-hidden transition-all duration-300 ease-in-out prose prose-sm"
+    :class="expanded ? 'grid-rows-[1fr] opacity-100 pb-6' : 'grid-rows-[0fr] opacity-0'"
+    x-cloak
+  >
+    <ul role="list" class="overflow-hidden">
+      <li>Multiple strap configurations</li>
+      <li>Spacious interior with top zip</li>
+      <li>Leather handle and tabs</li>
+      <li>Interior dividers</li>
+      <li>Stainless strap loops</li>
+      <li>Double stitched construction</li>
+      <li>Water-resistant</li>
+    </ul>
+  </div>
+</div>
+
+<style>
+  .plusminus {
+    &:before,
+    &:after {
+      background-color: {{ color }}
+    }
+  }
+</style>

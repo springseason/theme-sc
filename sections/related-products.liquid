@@ -1,0 +1,22 @@
+{% schema %}
+{
+  "name": "Related Products",
+  "class": "section-related-products",
+  "tag": "section",
+  "settings": [
+    {
+      "id": "title",
+      "type": "text",
+      "label": "Section title",
+      "default": "Customers also bought"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Related products"
+    }
+  ]
+}
+{% endschema %}
+
+{% render 'product-grid-small' %}
