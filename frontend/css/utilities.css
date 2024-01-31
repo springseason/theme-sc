@@ -6,4 +6,8 @@
   .pin-x {
     @apply inset-x-0;
   }
+
+  .base-fade {
+    @apply transition-colors duration-300 ease-out
+  }
 }

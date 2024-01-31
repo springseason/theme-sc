@@ -2,7 +2,6 @@
   html {
     -webkit-tap-highlight-color: transparent;
   }
-
   h1 {
     @apply text-5xl font-bold;
   }
@@ -11,8 +10,5 @@
   }
   h3 {
     @apply text-2xl font-bold;
-  }
-  a {
-    @apply text-cloud-burst-500 font-bold;
   }
 }

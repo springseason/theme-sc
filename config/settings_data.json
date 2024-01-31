@@ -14,7 +14,36 @@
     "sections": {
       "header": {
         "type": "header",
+        "blocks": {
+          "promo_bar_YHXfJt": {
+            "type": "promo-bar",
+            "settings": {
+              "promo_bar_content": "Diszko",
+              "collapse_promo_bar": true,
+              "promo_color_scheme": "scheme-95699083-ad4e-4c38-a5dd-381441eeb341"
+            }
+          },
+          "search_wRyn6x": {
+            "type": "search",
+            "settings": {
+            }
+          },
+          "cart_9BQ9Hr": {
+            "type": "cart",
+            "settings": {
+              "select_cart_type": "mini-cart"
+            }
+          }
+        },
+        "block_order": [
+          "promo_bar_YHXfJt",
+          "search_wRyn6x",
+          "cart_9BQ9Hr"
+        ],
         "settings": {
+          "menu": "main-menu",
+          "color_scheme": "default-palette",
+          "menu_color_scheme": "scheme-95699083-ad4e-4c38-a5dd-381441eeb341"
         }
       },
       "minicart": {
@@ -41,6 +70,30 @@
     },
     "content_for_index": [
 
-    ]
+    ],
+    "color_schemes": {
+      "default-palette": {
+        "settings": {
+          "background": "#000000",
+          "background_gradient": "",
+          "text": "#d7356e",
+          "button": "#54ab32",
+          "button_label": "#ffffff",
+          "shadow": "#121212",
+          "hover": "#00ff85"
+        }
+      },
+      "scheme-95699083-ad4e-4c38-a5dd-381441eeb341": {
+        "settings": {
+          "background": "#909090",
+          "background_gradient": "",
+          "text": "#00ff85",
+          "button": "#54ab32",
+          "button_label": "#ffffff",
+          "shadow": "#121212",
+          "hover": "#007569"
+        }
+      }
+    }
   }
 }

@@ -14,16 +14,16 @@
 
 <div class="px-6 md:px-8 py-12">
   <div class="container">
-    <div>
+    {% comment %} <div>
       {% for link in linklists.footer.links %}
         <a href="{{ link.url }}">
           {{ link.title }}
         </a>
       {% endfor %}
-    </div>
-  
-    <small>
+    </div> {% endcomment %}
+
+    {% comment %} <small>
       &copy; {{ "now" | date: "%Y" }} Slayed Starter Theme
-    </small>
+    </small> {% endcomment %}
   </div>
 </div>

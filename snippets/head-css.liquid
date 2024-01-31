@@ -1,11 +1,18 @@
+{% assign default_palette = settings.color_schemes['default-palette'].settings %}
+
 <style id="head-css">
   :root {
-    --test-css-var: '10px';
-  }
-
-  [x-cloak] {
+    [x-cloak] {
     display: none !important;
   }
+    {% if default_palette != empty %}
+      --default-bg: {{ default_palette.background }};
+      --default-gradient: {{ default_palette.background_gradient | default: '' }};
+      --default-text: {{ default_palette.text }};
+      --default-button: {{ default_palette.button }};
+      --default-button-label: {{ default_palette.button_label }};
+      --default-shadow: {{ default_palette.shadow }};
+      --default-hover: {{ default_palette.hover }};
+    {% endif %}
+  }
 </style>
-
-

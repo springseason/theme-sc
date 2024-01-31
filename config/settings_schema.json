@@ -1,11 +1,11 @@
 [
   {
     "name": "theme_info",
-    "theme_name": "Shopify Theme Lab",
-    "theme_version": "1.0.0",
-    "theme_author": "THEME_AUTHOR",
-    "theme_documentation_url": "https://THEME_DOCUMENTATION_URL.com",
-    "theme_support_url": "https://THEME_SUPPORT_URL.com"
+    "theme_name": "Cherry",
+    "theme_version": "0.0.1",
+    "theme_author": "springseason\/menya",
+    "theme_documentation_url": "https:\/\/THEME_DOCUMENTATION_URL.com",
+    "theme_support_url": "https:\/\/THEME_SUPPORT_URL.com"
   },
   {
     "name": "Theme Settings",
@@ -59,6 +59,79 @@
         "id": "modal_description",
         "label": "Description",
         "default": "Modal Description. Lorem ipsum dolor sit amet consectetur adipisicing elit. Itaque totam cum cupiditate officia et quaerat blanditiis culpa? Hic, nesciunt id."
+      }
+    ]
+  },
+  {
+    "name": "t:settings_schema.colors.name",
+    "settings": [
+      {
+        "type": "color_scheme_group",
+        "id": "color_schemes",
+        "definition": [
+          {
+            "type": "color",
+            "id": "background",
+            "label": "t:settings_schema.colors.settings.background.label",
+            "default": "#FFFFFF"
+          },
+          {
+            "type": "color_background",
+            "id": "background_gradient",
+            "label": "t:settings_schema.colors.settings.background_gradient.label",
+            "info": "t:settings_schema.colors.settings.background_gradient.info"
+          },
+          {
+            "type": "color",
+            "id": "text",
+            "label": "t:settings_schema.colors.settings.text.label",
+            "default": "#121212"
+          },
+          {
+            "type": "color",
+            "id": "button",
+            "label": "t:settings_schema.colors.settings.button_background.label",
+            "default": "#121212"
+          },
+          {
+            "type": "color",
+            "id": "button_label",
+            "label": "t:settings_schema.colors.settings.button_label.label",
+            "default": "#FFFFFF"
+          },
+          {
+            "type": "color",
+            "id": "secondary_button_label",
+            "label": "t:settings_schema.colors.settings.secondary_button_label.label",
+            "default": "#121212"
+          },
+          {
+            "type": "color",
+            "id": "shadow",
+            "label": "t:settings_schema.colors.settings.shadow.label",
+            "default": "#121212"
+          },
+          {
+            "type": "color",
+            "id": "hover",
+            "label": "t:settings_schema.colors.settings.hover.label",
+            "default": "#FF0000"
+          }
+        ],
+        "role": {
+          "text": "text",
+          "background": {
+            "solid": "background"
+          },
+          "links": "secondary_button_label",
+          "icons": "text",
+          "primary_button": "button",
+          "on_primary_button": "button_label",
+          "primary_button_border": "button",
+          "secondary_button": "background",
+          "on_secondary_button": "secondary_button_label",
+          "secondary_button_border": "secondary_button_label"
+        }
       }
     ]
   }

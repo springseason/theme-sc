@@ -1,6 +1,6 @@
 @layer components {
   .skip-to-content-link {
-    @apply absolute z-50 px-4 py-2 text-white bg-cloud-burst rounded-lg shadow-lg;
+    @apply absolute z-50 px-4 py-2 text-white bg-default-background rounded-lg shadow-lg;
   }
 
   .skip-to-content-link:not(:focus) {
@@ -10,14 +10,14 @@
     padding: 0;
     margin: -1px;
     overflow: hidden;
-    clip: rect(0,0,0,0);
+    clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border-width: 0;
   }
 
   .btn {
-    @apply py-3 px-12 bg-indigo-900 hover:bg-cloud-burst-600 text-white rounded-full transition;
-  } 
+    @apply py-3 px-12 bg-indigo-900 hover:bg-default-background text-white rounded-full transition;
+  }
 
   .pill-button {
     @apply bg-indigo-900 text-white px-4 rounded-lg cursor-pointer;
@@ -28,6 +28,10 @@
   }
 
   .site-promo-bar-tw-component {
-    @apply flex px-4 py-1 top-0 w-full items-center justify-center bg-woodland-500 text-white;
+    @apply flex px-4 py-1 top-0 w-full items-center justify-center;
+  }
+
+  .header-nav {
+    @apply flex items-center px-2 cursor-pointer h-16;
   }
 }
