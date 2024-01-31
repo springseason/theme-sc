@@ -43,29 +43,11 @@ module.exports = {
       '2xl': '1536px',
       // => @media (min-width: 1536px) { ... }
     },
+    fontFamily: {
+      sans: 'var(--font-body-family)',
+      heading: 'var(--font-heading-family)',
+    },
     extend: {
-      fontFamily: {
-        'open-sans': ['"Open Sans"', 'sans-serif'],
-      },
-      typography: {
-        DEFAULT: {
-          css: {
-            maxWidth: 'none',
-            color: 'var(--color-neutral-400)',
-            iframe: {
-              width: '100%',
-              height: '100%',
-              aspectRatio: '16/9',
-            },
-            a: {
-              color: 'var(--color-secondary-500)',
-              '&:hover': {
-                color: 'var(--color-secondary-200)',
-              },
-            },
-          },
-        },
-      },
       colors: {
         default: {
           background: 'var(--default-bg)',

@@ -1,10 +1,35 @@
 {
   "settings_schema": {
+    "typography": {
+      "name": "Typography",
+      "settings": {
+        "type_header_font": {
+          "label": "Font",
+          "info": "Selecting a different font can affect the speed of your store. [Learn more about system fonts.](https://help.shopify.com/manual/online-store/os/store-speed/improving-speed#fonts)"
+        },
+        "heading_scale": {
+          "label": "Font size scale"
+        },
+        "header__1": {
+          "content": "Headings"
+        },
+        "header__2": {
+          "content": "Body"
+        },
+        "type_body_font": {
+          "label": "Font",
+          "info": "Selecting a different font can affect the speed of your store. [Learn more about system fonts.](https://help.shopify.com/manual/online-store/os/store-speed/improving-speed#fonts)"
+        },
+        "body_scale": {
+          "label": "Font size scale"
+        }
+      }
+    },
     "custom_settings": {
       "name": "Custom settings",
       "settings": {
         "header": "About JSON settings",
-        "paragraph": "The settings_schema.json file controls the content of the Theme settings area of the theme editor. Settings in this file translate to global theme settings, which can be accessed through the Liquid settings object. [Learn more](https:\/\/shopify.dev\/themes\/architecture\/settings)"
+        "paragraph": "The settings_schema.json file controls the content of the Theme settings area of the theme editor. Settings in this file translate to global theme settings, which can be accessed through the Liquid settings object. [Learn more](https://shopify.dev/themes/architecture/settings)"
       }
     },
     "colors": {
@@ -43,13 +68,13 @@
     "header": {
       "name": "Header",
       "settings": {
-        "paragraph": "Add custom settings for this section. [Learn more](https:\/\/shopify.dev\/themes\/architecture\/settings)"
+        "paragraph": "Add custom settings for this section. [Learn more](https://shopify.dev/themes/architecture/settings)"
       }
     },
     "footer": {
       "name": "Footer",
       "settings": {
-        "paragraph": "Add custom settings for this section. [Learn more](https:\/\/shopify.dev\/themes\/architecture\/settings)"
+        "paragraph": "Add custom settings for this section. [Learn more](https://shopify.dev/themes/architecture/settings)"
       }
     }
   }
