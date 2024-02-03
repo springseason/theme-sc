@@ -1,26 +1,27 @@
 {% schema %}
-  {
-    "name": "Product Section",
-    "class": "section-main-product",
-    "tag": "section",
-    "settings": [
-      {
-        "type": "radio",
-        "id": "picker_type",
-        "label": "Variant Picker Type",
-        "options": [
-          {
-            "value": "radio",
-            "label": "Radio Buttons"
-          }, {
-            "value": "select",
-            "label": "Select Dropdowns"
-          }
-        ],
-        "default": "radio"
-      }
-    ]
-  }
+{
+  "name": "Product Section",
+  "class": "section-main-product",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "radio",
+      "id": "picker_type",
+      "label": "Variant Picker Type",
+      "options": [
+        {
+          "value": "radio",
+          "label": "Radio Buttons"
+        },
+        {
+          "value": "select",
+          "label": "Select Dropdowns"
+        }
+      ],
+      "default": "radio"
+    }
+  ]
+}
 {% endschema %}
 
 <div
@@ -30,15 +31,26 @@
   data-url="{{ product.url }}"
   data-section="{{ section.id }}"
   data-prodify="{{ section.settings.picker_type }}"
-  >
-
+>
   <script type="application/json" data-prodify-variants-json>
     {{ product.variants | json }}
   </script>
 
-  <a class="skip-to-content-link" href="#product-info-{{ section.id }}">
-    Skip to product info
-  </a>
+  {% assign cross_products = product.metafields.custom_option.cross_sell_products.value %}
+
+  {% unless cross_products == empty %}
+    {% for cross_product in cross_products %}
+      <script
+        type="application/json"
+        data-prodify-crossproduct-variants-json
+        data-prodify-crossproduct-title="{{ cross_product.title }}"
+      >
+        {{ cross_product | json }}
+      </script>
+    {% endfor %}
+  {% endunless %}
+
+  <a class="skip-to-content-link" href="#product-info-{{ section.id }}"> Skip to product info </a>
   <div class="flex pdp-main" style="position: relative;">
     <div class="media" data-prodify-media-container>
       <span style="position: absolute; top: 0; left: 0; z-index: 1; font-size: 10px;">
@@ -46,7 +58,8 @@
       </span>
       <div
         class="image-wrapper"
-        style="padding-top: 137%; overflow: hidden;">
+        style="padding-top: 137%; overflow: hidden;"
+      >
         {% if product.selected_variant and product.selected_variant.image %}
           {% assign media = product.selected_variant.image %}
         {% else %}
@@ -61,7 +74,7 @@
           width="{{ media.width }}"
           class="absolute h-full w-full object-cover"
           loading="eager"
-          >
+        >
         <h1 class="text-4xl z-50 relative">
           {{ product.selected_or_first_available_variant.options }}
         </h1>
@@ -77,15 +90,31 @@
             {{ product.selected_or_first_available_variant.compare_at_price | money }}
           </span>
         {% endif %}
-        <span>
+        <span id="regular-price">
           {{ product.selected_or_first_available_variant.price | money }}
         </span>
       </div>
+      {% unless cross_products == blank %}
+        <div class="flex items-center py-2">
+          <span class="sr-only">Price including cross-product options</span>
+          {% comment %} PRODIFY fills it {% endcomment %}
+          <span id="total-price">&nbsp;</span>
+        </div>
+      {% endunless %}
 
-      {% render 'product-variant-picker'
-       , product: product,
-       product_form_id: 'product-form-id',
-       picker_type: section.settings.picker_type %}
+      {% render 'product-variant-picker',
+        product: product,
+        product_form_id: 'product-form-id',
+        picker_type: section.settings.picker_type
+      %}
+
+      {%- unless cross_products == blank -%}
+        {% render 'cross-product-picker',
+          cross_products: cross_products,
+          product_form_id: 'product-form-id',
+          picker_type: 'radio'
+        %}
+      {%- endunless %}
 
       <div class="quantity-row">
         <label for="quantity-control-input">Quantity</label>
@@ -99,7 +128,8 @@
             id="quantity-control-input"
             value="1"
             disabled=""
-            data-prodify-quantity-presentation>
+            data-prodify-quantity-presentation
+          >
           <button type="button" data-prodify-quantity-increment>
             {% render 'icon-plus' %}
           </button>
@@ -112,23 +142,27 @@
           id="product_form_id"
           class="product-form"
           novalidate="novalidate"
-          data-prodify-product-form>
+          data-prodify-product-form
+        >
           <input
             type="hidden"
             name="id"
-            value="{{ product.selected_or_first_available_variant.id }}">
+            value="{{ product.selected_or_first_available_variant.id }}"
+          >
           <input
             type="hidden"
             name="quantity"
-            value="1">
+            value="1"
+          >
           <div class="mb-[10px]">
             <button
               type="submit"
               name="add"
               class="px-6 hover:bg-cloud-burst-400 bg-indigo-900 text-white w-full h-12 cursor-pointer disabled:cursor-default disabled:bg-gray-200 disabled:text-black"
               {% if product.selected_or_first_available_variant.available == false %}
-              disabled
-              {% endif %}>
+                disabled
+              {% endif %}
+            >
               <span class="[[processing]_&]:hidden">
                 {%- if product.selected_or_first_available_variant.available -%}
                   Add to cart
@@ -136,24 +170,21 @@
                   Sold out
                 {%- endif -%}
               </span>
-              <span class="hidden [[processing]_&]:block">
-                Adding to cart...
-              </span>
+              <span class="hidden [[processing]_&]:block"> Adding to cart... </span>
             </button>
-          </div> 
-          <div data-ajax-cart-errors="form"><!-- Error messages appear here -->
           </div>
+          <div data-ajax-cart-errors="form"><!-- Error messages appear here --></div>
           {% comment %}
-          {%- if product.selected_or_first_available_variant.available -%}
-          <a
-          type="button"
-          class="w-full h-12 px-6 text-white bg-indigo-900 flex items-center justify-center hover:after:border-offset-1"
-          :href="`/cart/${selectedVariant}:1`"
-          x-show="showBuyNow"
-          >
-          Buy it now
-          </a>
-          {%- endif -%}
+            {%- if product.selected_or_first_available_variant.available -%}
+            <a
+            type="button"
+            class="w-full h-12 px-6 text-white bg-indigo-900 flex items-center justify-center hover:after:border-offset-1"
+            :href="`/cart/${selectedVariant}:1`"
+            x-show="showBuyNow"
+            >
+            Buy it now
+            </a>
+            {%- endif -%}
           {% endcomment %}
         </form>
       </ajax-cart-product-form>
@@ -172,10 +203,11 @@
 
   .section-main-product {
     padding: 50px;
-    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Ubuntu, Helvetica Neue, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Ubuntu, Helvetica Neue, sans-serif,
+      Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
   }
 
-  @media(max-width: 576px) {
+  @media (max-width: 576px) {
     .section-main-product {
       padding: 15px;
     }
@@ -258,7 +290,14 @@
     cursor: pointer;
   }
 
-  body:not(.using-mouse) .section-main-product .shopify-section-main-product-inner .flex .info fieldset input:focus + label {
+  body:not(.using-mouse)
+    .section-main-product
+    .shopify-section-main-product-inner
+    .flex
+    .info
+    fieldset
+    input:focus
+    + label {
     outline: #08f auto 2px;
   }
 
@@ -287,7 +326,13 @@
     font-size: 14px;
   }
 
-  .section-main-product .shopify-section-main-product-inner .flex .info .quantity-row .quantity-control-container button {
+  .section-main-product
+    .shopify-section-main-product-inner
+    .flex
+    .info
+    .quantity-row
+    .quantity-control-container
+    button {
     width: 45px;
     height: 45px;
     appearance: none;
@@ -301,11 +346,24 @@
     cursor: pointer;
   }
 
-  .section-main-product .shopify-section-main-product-inner .flex .info .quantity-row .quantity-control-container button svg {
+  .section-main-product
+    .shopify-section-main-product-inner
+    .flex
+    .info
+    .quantity-row
+    .quantity-control-container
+    button
+    svg {
     width: 10px;
   }
 
-  .section-main-product .shopify-section-main-product-inner .flex .info .quantity-row .quantity-control-container input {
+  .section-main-product
+    .shopify-section-main-product-inner
+    .flex
+    .info
+    .quantity-row
+    .quantity-control-container
+    input {
     appearance: none;
     -webkit-appearance: none;
     border: none;
@@ -315,8 +373,20 @@
     padding: 0;
   }
 
-  .section-main-product .shopify-section-main-product-inner .flex .info .quantity-row .quantity-control-container input[type='number']::-webkit-inner-spin-button,
-  .section-main-product .shopify-section-main-product-inner .flex .info .quantity-row .quantity-control-container input[type='number']::-webkit-outer-spin-button {
+  .section-main-product
+    .shopify-section-main-product-inner
+    .flex
+    .info
+    .quantity-row
+    .quantity-control-container
+    input[type='number']::-webkit-inner-spin-button,
+  .section-main-product
+    .shopify-section-main-product-inner
+    .flex
+    .info
+    .quantity-row
+    .quantity-control-container
+    input[type='number']::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
   }
