@@ -22,10 +22,6 @@
   assign product_form_id = 'product-form-' | append: section.id
 -%}
 
-{% comment %} <script>
-  console.log({{ product.variants | json }})
-</script> {% endcomment %}
-
 {%- for value in option.values -%}
   {%- liquid
     assign option_not_exist = true
@@ -78,8 +74,8 @@
         class="hidden [&:checked+label]:bg-indigo-900 [&:checked+label]:text-white"
       {% endif %}
     >
-    <label 
-      for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}" 
+    <label
+      for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
       @keyup.enter="$el.click()"
       class="bg-slate-100 text-black"
       >

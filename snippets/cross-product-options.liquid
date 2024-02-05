@@ -18,15 +18,7 @@
   assign variants_option1_arr = product.variants | map: 'option1'
   assign variants_option2_arr = product.variants | map: 'option2'
   assign variants_option3_arr = product.variants | map: 'option3'
-
-  assign product_form_id = 'product-form-' | append: section.id
 -%}
-
-{% comment %}
-  <script>
-    console.log({{ product.variants | json }})
-  </script>
-{% endcomment %}
 
 {%- for value in option.values -%}
   {%- liquid
@@ -62,15 +54,14 @@
       endcase
     endfor
   -%}
-
   {%- if picker_type == 'radio' -%}
     <input
       type="radio"
-      id="{{ section.id }}-crossoption-{{product.tags.first}}-{{ option.position }}-{{ forloop.index0 }}"
+      id="{{ section.id }}-cross-option-{{product.tags.first}}-{{ option.position }}-{{ forloop.index0 }}"
       name="{{ option.name }}"
       value="{{ value | escape }}"
-      form="{{ product_form_id }}"
       data-prodify-cross-product-radio
+      data-prodify-cross-product-title="{{ product.title }}"
       {% if option.selected_value == value %}
         checked
       {% endif %}
@@ -81,30 +72,32 @@
       {% endif %}
     >
     <label
-      for="{{ section.id }}-crossoption-{{product.tags.first}}-{{ option.position }}-{{ forloop.index0 }}"
+      for="{{ section.id }}-cross-option-{{product.tags.first}}-{{ option.position }}-{{ forloop.index0 }}"
       @keyup.enter="$el.click()"
       class="bg-slate-100 text-black"
     >
       {{ value -}}
       <span class="visually-hidden sr-only">{{ 'products.product.variant_sold_out_or_unavailable' | t }}</span>
     </label>
-  {%- else -%}
-    <option
-      value="{{ value | escape }}"
-      data-option-position="option{{ option.position }}"
-      {% if option.selected_value == value %}
-        selected="selected"
-      {% endif %}
-    >
-      {% if option_unavailable -%}
-        {% if option_not_exist %}
-          {{- 'products.product.value_unavailable' | t: option_value: value -}}
-        {% else %}
-          {{- 'products.product.value_sold_out' | t: option_value: value -}}
-        {% endif %}
+    {% comment %}
       {%- else -%}
-        {{- value -}}
-      {%- endif %}
-    </option>
+      <option
+        value="{{ value | escape }}"
+        data-option-position="option{{ option.position }}"
+        {% if option.selected_value == value %}
+          selected="selected"
+        {% endif %}
+      >
+        {% if option_unavailable -%}
+          {% if option_not_exist %}
+            {{- 'products.product.value_unavailable' | t: option_value: value -}}
+          {% else %}
+            {{- 'products.product.value_sold_out' | t: option_value: value -}}
+          {% endif %}
+        {%- else -%}
+          {{- value -}}
+        {%- endif %}
+      </option>
+    {% endcomment %}
   {%- endif -%}
 {%- endfor -%}

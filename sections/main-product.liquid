@@ -42,8 +42,8 @@
     {% for cross_product in cross_products %}
       <script
         type="application/json"
-        data-prodify-crossproduct-variants-json
-        data-prodify-crossproduct-title="{{ cross_product.title }}"
+        data-prodify-cross-product-variants-json
+        data-prodify-cross-product-title="{{ cross_product.title }}"
       >
         {{ cross_product | json }}
       </script>
@@ -86,6 +86,7 @@
       <div class="flex items-center py-2" data-prodify-price-container>
         <span class="sr-only">Regular Price</span>
         {% if product.selected_or_first_available_variant.compare_at_price %}
+          <span class="sr-only">Compare at price</span>
           <span class="line-through">
             {{ product.selected_or_first_available_variant.compare_at_price | money }}
           </span>

@@ -1,9 +1,6 @@
 class Prodify {
   constructor(settings) {
-    this.settings = {
-      ...settings
-    };
-
+    this.settings = { ...settings };
     this.el = document.querySelector('[data-prodify]');
     this.pickerType = this.el.dataset.prodify;
 
@@ -11,14 +8,13 @@ class Prodify {
       priceContainer: '[data-prodify-price-container]',
       mediaContainer: '[data-prodify-media-container]',
       variantsJson: '[data-prodify-variants-json]',
-      crossProductJson: '[data-prodify-crossproduct-variants-json]',
+      cpJson: '[data-prodify-cross-product-variants-json]',
       optionContainer: '[data-prodify-option-container]',
       productForm: '[data-prodify-product-form]',
       quantityIncrement: '[data-prodify-quantity-increment]',
       quantityDecrement: '[data-prodify-quantity-decrement]',
-      quantityPresentation: '[data-prodify-quantity-presentation]'
-      // crossOptionContainer: '[data-prodify-cross-option-container]', // not in use
-      // crossOption: '[data-prodify-cross-option]' // not in use
+      quantityPresentation: '[data-prodify-quantity-presentation]',
+      crossProductTitle: 'data-prodify-cross-product-title' // ! no brackets
     };
 
     this.textStrings = {
@@ -33,11 +29,7 @@ class Prodify {
     this.quantityPresentationInput = this.el.querySelector(this.selectors.quantityPresentation);
     this.quantityHiddenInput = this.el.querySelector('input[name="quantity"]');
 
-    this.totalPriceEl = this.el.querySelector('#total-price');
-    if (this.totalPriceEl) {
-      this.updateTotalPrice();
-    }
-
+    this.updateTotalPrice();
     this.initEventListeners();
   }
 
@@ -56,19 +48,55 @@ class Prodify {
   };
 
   updateTotalPrice = () => {
-    this.x = this.el.querySelectorAll('input[data-prodify-cross-product-radio]:checked');
-    const xpVariants = this.getCrossProductData().variants;
-    this.activeXP = this.getCrossProductData().variants.find(
-      (v) => v.title === `${this.x[0].value} / ${this.x[1].value}`
+    const totalPriceEl = this.el.querySelector('#total-price');
+    if (!totalPriceEl) {
+      return;
+    } else if (!totalPriceEl.textContent) {
+      return console.error('total price el not found');
+    }
+
+    const regularPriceEl = this.el.querySelector('#regular-price');
+    if (!regularPriceEl || !regularPriceEl.textContent) {
+      return console.error('regular price el not found');
+    }
+
+    const currentCrossProductOptionEls = Array.from(
+      this.el.querySelectorAll(`input[data-prodify-cross-product-radio]:checked`)
     );
 
-    if (this.totalPriceEl) {
-      const { currency, amount: basePrice } = this.parseMoneyString(
-        this.el.querySelector('#regular-price')?.textContent
-      );
-      const formattedXpPrice = this.formatNumber(this.activeXP.price);
-      this.totalPriceEl.textContent = this.formatCurrency(currency)(basePrice + formattedXpPrice);
-    }
+    // [{ productTitle: variantTitle }, ...]
+    const groupedData = currentCrossProductOptionEls.reduce((acc, node) => {
+      const title = node.getAttribute(this.selectors.crossProductTitle);
+      const variantOption = node.getAttribute('value');
+      acc[title] = acc[title] ? `${acc[title]} / ${variantOption}` : variantOption;
+      return acc;
+    }, {});
+
+    // { variantTitle: { price, ... other FE data }}
+    const priceByVariantTitle = Object.entries(groupedData).reduce((acc, [productTitle, variantTitle]) => {
+      const product = this.getCrossProductData(productTitle);
+      const currentVariant = product.variants.find((v) => v.title === variantTitle);
+
+      return {
+        ...acc,
+        [variantTitle]: {
+          price: this.parseShopifyPrice(currentVariant.price)
+        }
+      };
+    }, {});
+
+    const regularPrice = this.parseMoneyString(regularPriceEl.textContent);
+    const totalCrossPrice = Object.values(priceByVariantTitle).reduce((acc, val) => acc + val.price, 0);
+    totalPriceEl.textContent = this.formatCurrency(regularPrice.currency)(regularPrice.amount + totalCrossPrice);
+  };
+
+  updateQuantity = (stepDirection) => {
+    const adjustQuantity = (direction) => (quantity) => Math.max(1, quantity + direction);
+
+    const previousQuantity = parseInt(this.quantityPresentationInput.value);
+    const newQuantity = adjustQuantity(stepDirection === 'up' ? 1 : -1)(previousQuantity);
+
+    this.quantityHiddenInput.value = this.quantityPresentationInput.value = newQuantity;
   };
 
   updateCurrentVariant = () => {
@@ -79,16 +107,6 @@ class Prodify {
       });
     });
     this.currentVariant = matchingVariant;
-  };
-
-  updateQuantity = (stepDirection) => {
-    const previousQuantity = parseInt(this.quantityPresentationInput.value);
-
-    if (stepDirection == 'up') {
-      this.quantityHiddenInput.value = this.quantityPresentationInput.value = previousQuantity + 1;
-    } else {
-      this.quantityHiddenInput.value = this.quantityPresentationInput.value = Math.max(1, previousQuantity - 1);
-    }
   };
 
   updateCurrentOptions = () => {
@@ -142,11 +160,12 @@ class Prodify {
   }
 
   onVariantChange = (event) => {
-    if (event.target.hasAttribute('data-prodify-cross-product-radio')) {
-      console.log('EV', event.target);
+    if (
+      event.target.hasAttribute('data-prodify-cross-product-radio') &&
+      event.target.hasAttribute(this.selectors.crossProductTitle)
+    ) {
       event.preventDefault();
-      this.updateTotalPrice();
-      return;
+      return this.updateTotalPrice();
     }
 
     this.updateCurrentOptions();
@@ -159,7 +178,7 @@ class Prodify {
     } else {
       this.updateURL();
       this.updateVariantIdInput();
-      this.swapProductInfo();
+      this.swapProductInfo(this.updateTotalPrice);
     }
   };
 
@@ -231,7 +250,7 @@ class Prodify {
     });
   }
 
-  swapProductInfo = () => {
+  swapProductInfo = (callback) => {
     window.slayed.helpers
       .fetchHTML(`${this.el.dataset.url}?variant=${this.currentVariant.id}&section_id=${this.el.dataset.section}`)
       .then((responseHTML) => {
@@ -244,10 +263,6 @@ class Prodify {
 
         if (priceSource && priceTarget) {
           priceTarget.replaceWith(priceSource);
-
-          if (this.totalPriceEl) {
-            this.updateTotalPrice();
-          }
         }
 
         if (mediaSource && mediaTarget) {
@@ -257,7 +272,8 @@ class Prodify {
         if (addButtonSource && addButtonTarget) {
           addButtonTarget.replaceWith(addButtonSource);
         }
-      });
+      })
+      .then(() => callback());
   };
 
   getVariantData = () => {
@@ -265,9 +281,15 @@ class Prodify {
     return this.variantData;
   };
 
-  getCrossProductData = () => {
-    this.crossProductData = JSON.parse(this.el.querySelector(this.selectors.crossProductJson).textContent);
-    return this.crossProductData;
+  getCrossProductData = (title) => {
+    if (typeof title === 'string') {
+      const selectorString = `${this.selectors.cpJson}[${this.selectors.crossProductTitle}="${title}"]`;
+
+      const cpData = JSON.parse(this.el.querySelector(selectorString).textContent);
+      return cpData;
+    } else {
+      throw new Error('Cross product title is missing');
+    }
   };
 
   // Money handling
@@ -281,12 +303,8 @@ class Prodify {
     }
   };
   formatCurrency = (currency) => (amount) => `${currency}${amount.toLocaleString('en-UK')}`;
-  formatNumber = (amount) => Number((amount / 100).toFixed(2));
-  compose =
-    (...fns) =>
-    (arg) =>
-      fns.reduceRight((acc, fn) => fn(acc), arg);
   sanitizeAndTrim = (str) => str.trim().replace(/,/g, '.');
+  parseShopifyPrice = (amount) => Number((amount / 100).toFixed(2));
   parseMoneyString = (moneyString) => {
     if (typeof moneyString !== 'string') {
       return {};
@@ -314,6 +332,18 @@ class Prodify {
 
     return {};
   };
+
+  compose =
+    (...fns) =>
+    (arg) =>
+      fns.reduceRight((acc, fn) => fn(acc), arg);
+
+  pipe =
+    (...fns) =>
+    (arg) =>
+      fns.reduce((acc, fn) => fn(acc), arg);
+
+  // ... (rest of the helper methods)
 }
 
 window.prodify = new Prodify();
