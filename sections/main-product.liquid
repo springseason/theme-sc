@@ -145,12 +145,12 @@
             {% assign cross_index = forloop.index | minus: 1 %}
             <input
               type="hidden"
-              name="cross-product-id_{{ cross_index }}"
+              name="items[{{ cross_index }}][id]"
               value="{{ cross_product.selected_or_first_available_variant.id }}"
             >
             <input
               type="hidden"
-              name="cross-product-quantity_{{ cross_index }}"
+              name="items[{{ cross_index }}][quantity]"
               value="1"
             >
           {% endfor %}
@@ -174,18 +174,6 @@
             </button>
           </div>
           <div data-ajax-cart-errors="form"><!-- Error messages appear here --></div>
-          {% comment %}
-            {%- if product.selected_or_first_available_variant.available -%}
-            <a
-            type="button"
-            class="w-full h-12 px-6 text-white bg-indigo-900 flex items-center justify-center hover:after:border-offset-1"
-            :href="`/cart/${selectedVariant}:1`"
-            x-show="showBuyNow"
-            >
-            Buy it now
-            </a>
-            {%- endif -%}
-          {% endcomment %}
         </form>
       </ajax-cart-product-form>
 
