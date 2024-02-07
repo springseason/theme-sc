@@ -3,6 +3,14 @@
 {%- unless cross_products == blank -%}
   <div class="cross-product-radios">
     {% for cross_product in cross_products %}
+      <script
+        type="application/json"
+        data-prodify-cross-product-json
+        data-prodify-cross-product-title="{{ cross_product.title }}"
+      >
+        {{ cross_product | json }}
+      </script>
+
       {% for cross_option in cross_product.options_with_values %}
         <fieldset data-prodify-cross-option-container data-prodify-cross-option-current-idx="{{ variant_index }}">
           <legend>

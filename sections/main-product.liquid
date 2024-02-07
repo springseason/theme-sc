@@ -36,20 +36,6 @@
     {{ product.variants | json }}
   </script>
 
-  {% assign cross_products = product.metafields.custom_option.cross_sell_products.value %}
-
-  {% unless cross_products == empty %}
-    {% for cross_product in cross_products %}
-      <script
-        type="application/json"
-        data-prodify-cross-product-variants-json
-        data-prodify-cross-product-title="{{ cross_product.title }}"
-      >
-        {{ cross_product | json }}
-      </script>
-    {% endfor %}
-  {% endunless %}
-
   <a class="skip-to-content-link" href="#product-info-{{ section.id }}"> Skip to product info </a>
   <div class="flex pdp-main" style="position: relative;">
     <div class="media" data-prodify-media-container>
@@ -95,6 +81,7 @@
           {{ product.selected_or_first_available_variant.price | money }}
         </span>
       </div>
+      {% assign cross_products = product.metafields.custom_option.cross_sell_products.value %}
       {% unless cross_products == blank %}
         <div class="flex items-center py-2">
           <span class="sr-only">Price including cross-product options</span>

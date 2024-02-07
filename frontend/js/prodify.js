@@ -8,7 +8,7 @@ class Prodify {
       priceContainer: '[data-prodify-price-container]',
       mediaContainer: '[data-prodify-media-container]',
       variantsJson: '[data-prodify-variants-json]',
-      crossProductVariantsJson: '[data-prodify-cross-product-variants-json]',
+      crossProductVariantsJson: '[data-prodify-cross-product-json]',
       optionContainer: '[data-prodify-option-container]',
       productForm: '[data-prodify-product-form]',
       quantityIncrement: '[data-prodify-quantity-increment]',
