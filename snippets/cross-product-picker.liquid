@@ -1,17 +1,19 @@
 {% assign target_metafield_key = 'custom_option.cross_sell_products' %}
 
 {%- unless cross_products == blank -%}
-  {% for cross_product in cross_products %}
-    {% for cross_option in cross_product.options_with_values %}
-      <fieldset data-prodify-cross-option-container>
-        <legend>
-          {{ cross_product.title }} -
-          {{ cross_option.name }}
-        </legend>
-        {% render 'cross-product-options', product: cross_product, option: cross_option, picker_type: 'radio' %}
-      </fieldset>
+  <div class="cross-product-radios">
+    {% for cross_product in cross_products %}
+      {% for cross_option in cross_product.options_with_values %}
+        <fieldset data-prodify-cross-option-container data-prodify-cross-option-current-idx="{{ variant_index }}">
+          <legend>
+            {{ cross_product.title }} -
+            {{ cross_option.name }}
+          </legend>
+          {% render 'cross-product-options', product: cross_product, option: cross_option, picker_type: 'radio' %}
+        </fieldset>
+      {% endfor %}
     {% endfor %}
-  {% endfor %}
+  </div>
 {% else %}
   <div>
     Please add a cross-sell product to the product's metafield:

@@ -1,103 +1,42 @@
 {% comment %}
-  Renders product variant options
+  Renders cross product options for a cross product
 
   Accepts:
-  - product: {Object} product object.
-  - option: {Object} current product_option object.
-  - picker_type: 'radio' || 'select'
+  - product: {Object} cross product object.
+  - option: {Object} current cross product_option object.
+  - picker_type: 'radio'
 
   Usage:
-  {% render 'product-variant-options',
-    product: product,
-    option: option,
-    picker_type: 'radio' || 'select'
+  {% render 'cross-product-options',
+    product: cross_product,
+    option: cross_option,
+    picker_type: 'radio'
   %}
 {% endcomment %}
-{%- liquid
-  assign variants_available_arr = product.variants | map: 'available'
-  assign variants_option1_arr = product.variants | map: 'option1'
-  assign variants_option2_arr = product.variants | map: 'option2'
-  assign variants_option3_arr = product.variants | map: 'option3'
--%}
 
 {%- for value in option.values -%}
-  {%- liquid
-    assign option_not_exist = true
-    assign option_unavailable = true
-
-    for option1_name in variants_option1_arr
-      case option.position
-        when 1
-          if variants_option1_arr[forloop.index0] == value
-            assign option_not_exist = false
-
-            if variants_available_arr[forloop.index0]
-              assign option_unavailable = false
-            endif
-          endif
-        when 2
-          if option1_name == product.selected_or_first_available_variant.option1 and variants_option2_arr[forloop.index0] == value
-            assign option_not_exist = false
-
-            if variants_available_arr[forloop.index0]
-              assign option_unavailable = false
-            endif
-          endif
-        when 3
-          if option1_name == product.selected_or_first_available_variant.option1 and variants_option2_arr[forloop.index0] == product.selected_or_first_available_variant.option2 and variants_option3_arr[forloop.index0] == value
-            assign option_not_exist = false
-
-            if variants_available_arr[forloop.index0]
-              assign option_unavailable = false
-            endif
-          endif
-      endcase
-    endfor
-  -%}
-  {%- if picker_type == 'radio' -%}
-    <input
-      type="radio"
-      id="{{ section.id }}-cross-option-{{product.tags.first}}-{{ option.position }}-{{ forloop.index0 }}"
-      name="{{ option.name }}"
-      value="{{ value | escape }}"
-      data-prodify-cross-product-radio
-      data-prodify-cross-product-title="{{ product.title }}"
-      {% if option.selected_value == value %}
-        checked
-      {% endif %}
-      {% if option_disabled %}
-        class="disabled hidden [&:checked+label]:bg-indigo-900 [&:checked+label]:text-white"
-      {% else %}
-        class="hidden [&:checked+label]:bg-indigo-900 [&:checked+label]:text-white"
-      {% endif %}
-    >
-    <label
-      for="{{ section.id }}-cross-option-{{product.tags.first}}-{{ option.position }}-{{ forloop.index0 }}"
-      @keyup.enter="$el.click()"
-      class="bg-slate-100 text-black"
-    >
-      {{ value -}}
-      <span class="visually-hidden sr-only">{{ 'products.product.variant_sold_out_or_unavailable' | t }}</span>
-    </label>
-    {% comment %}
-      {%- else -%}
-      <option
-        value="{{ value | escape }}"
-        data-option-position="option{{ option.position }}"
-        {% if option.selected_value == value %}
-          selected="selected"
-        {% endif %}
-      >
-        {% if option_unavailable -%}
-          {% if option_not_exist %}
-            {{- 'products.product.value_unavailable' | t: option_value: value -}}
-          {% else %}
-            {{- 'products.product.value_sold_out' | t: option_value: value -}}
-          {% endif %}
-        {%- else -%}
-          {{- value -}}
-        {%- endif %}
-      </option>
-    {% endcomment %}
-  {%- endif -%}
+  <input
+    type="radio"
+    id="{{ section.id }}-cross-option-{{product.tags.first}}-{{ option.position }}-{{ forloop.index0 }}"
+    name="{{ option.name }}"
+    value="{{ value | escape }}"
+    data-prodify-cross-product-radio
+    data-prodify-cross-product-title="{{ product.title }}"
+    {% if option.selected_value == value %}
+      checked
+    {% endif %}
+    {% if option_disabled %}
+      class="disabled hidden [&:checked+label]:bg-indigo-900 [&:checked+label]:text-white"
+    {% else %}
+      class="hidden [&:checked+label]:bg-indigo-900 [&:checked+label]:text-white"
+    {% endif %}
+  >
+  <label
+    for="{{ section.id }}-cross-option-{{product.tags.first}}-{{ option.position }}-{{ forloop.index0 }}"
+    @keyup.enter="$el.click()"
+    class="bg-slate-100 text-black"
+  >
+    {{ value -}}
+    <span class="visually-hidden sr-only">{{ 'products.product.variant_sold_out_or_unavailable' | t }}</span>
+  </label>
 {%- endfor -%}

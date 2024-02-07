@@ -8,7 +8,7 @@ class Prodify {
       priceContainer: '[data-prodify-price-container]',
       mediaContainer: '[data-prodify-media-container]',
       variantsJson: '[data-prodify-variants-json]',
-      cpJson: '[data-prodify-cross-product-variants-json]',
+      crossProductVariantsJson: '[data-prodify-cross-product-variants-json]',
       optionContainer: '[data-prodify-option-container]',
       productForm: '[data-prodify-product-form]',
       quantityIncrement: '[data-prodify-quantity-increment]',
@@ -34,7 +34,7 @@ class Prodify {
   }
 
   initEventListeners = () => {
-    this.el.addEventListener('change', this.onVariantChange);
+    this.el.addEventListener('change', this.onOptionChange);
 
     if (this.quantityIncrementButton && this.quantityDecrementButton && this.quantityPresentationInput) {
       this.quantityIncrementButton.addEventListener('click', () => {
@@ -45,49 +45,6 @@ class Prodify {
         this.updateQuantity('down');
       });
     }
-  };
-
-  updateTotalPrice = () => {
-    const totalPriceEl = this.el.querySelector('#total-price');
-    if (!totalPriceEl) {
-      return;
-    } else if (!totalPriceEl.textContent) {
-      return console.error('total price el not found');
-    }
-
-    const regularPriceEl = this.el.querySelector('#regular-price');
-    if (!regularPriceEl || !regularPriceEl.textContent) {
-      return console.error('regular price el not found');
-    }
-
-    const currentCrossProductOptionEls = Array.from(
-      this.el.querySelectorAll(`input[data-prodify-cross-product-radio]:checked`)
-    );
-
-    // [{ productTitle: variantTitle }, ...]
-    const groupedData = currentCrossProductOptionEls.reduce((acc, node) => {
-      const title = node.getAttribute(this.selectors.crossProductTitle);
-      const variantOption = node.getAttribute('value');
-      acc[title] = acc[title] ? `${acc[title]} / ${variantOption}` : variantOption;
-      return acc;
-    }, {});
-
-    // { variantTitle: { price, ... other FE data }}
-    const priceByVariantTitle = Object.entries(groupedData).reduce((acc, [productTitle, variantTitle]) => {
-      const product = this.getCrossProductData(productTitle);
-      const currentVariant = product.variants.find((v) => v.title === variantTitle);
-
-      return {
-        ...acc,
-        [variantTitle]: {
-          price: this.parseShopifyPrice(currentVariant.price)
-        }
-      };
-    }, {});
-
-    const regularPrice = this.parseMoneyString(regularPriceEl.textContent);
-    const totalCrossPrice = Object.values(priceByVariantTitle).reduce((acc, val) => acc + val.price, 0);
-    totalPriceEl.textContent = this.formatCurrency(regularPrice.currency)(regularPrice.amount + totalCrossPrice);
   };
 
   updateQuantity = (stepDirection) => {
@@ -159,12 +116,11 @@ class Prodify {
     }
   }
 
-  onVariantChange = (event) => {
+  onOptionChange = (event) => {
     if (
       event.target.hasAttribute('data-prodify-cross-product-radio') &&
       event.target.hasAttribute(this.selectors.crossProductTitle)
     ) {
-      event.preventDefault();
       return this.updateTotalPrice();
     }
 
@@ -250,6 +206,50 @@ class Prodify {
     });
   }
 
+  updateTotalPrice = () => {
+    const totalPriceEl = this.el.querySelector('#total-price');
+    if (!totalPriceEl) {
+      return;
+    } else if (!totalPriceEl.textContent) {
+      return console.error('total price el not found');
+    }
+
+    const regularPriceEl = this.el.querySelector('#regular-price');
+    if (!regularPriceEl || !regularPriceEl.textContent) {
+      return console.error('regular price el not found');
+    }
+
+    const currentCrossProductOptionEls = Array.from(
+      this.el.querySelectorAll(`input[data-prodify-cross-product-radio]:checked`)
+    );
+
+    // [{ productTitle: variantTitle }, ...]
+    const groupedData = currentCrossProductOptionEls.reduce((acc, node) => {
+      const title = node.getAttribute(this.selectors.crossProductTitle);
+      const variantOption = node.getAttribute('value');
+      acc[title] = acc[title] ? `${acc[title]} / ${variantOption}` : variantOption;
+      return acc;
+    }, {});
+
+    // { variantTitle: { price, ... other FE data }}
+    const priceByVariantTitle = Object.entries(groupedData).reduce((acc, [productTitle, variantTitle]) => {
+      const product = this.getCrossProductData(productTitle);
+      const currentVariantData = product.variants.find((v) => v.title === variantTitle);
+
+      return {
+        ...acc,
+        [variantTitle]: {
+          price: this.parseShopifyPrice(currentVariantData.price),
+          available: currentVariantData.available
+        }
+      };
+    }, {});
+
+    const regularPrice = this.parseMoneyString(regularPriceEl.textContent);
+    const totalCrossPrice = Object.values(priceByVariantTitle).reduce((acc, val) => acc + val.price, 0);
+    totalPriceEl.textContent = this.formatCurrency(regularPrice.currency)(regularPrice.amount + totalCrossPrice);
+  };
+
   swapProductInfo = (callback) => {
     window.slayed.helpers
       .fetchHTML(`${this.el.dataset.url}?variant=${this.currentVariant.id}&section_id=${this.el.dataset.section}`)
@@ -283,12 +283,12 @@ class Prodify {
 
   getCrossProductData = (title) => {
     if (typeof title === 'string') {
-      const selectorString = `${this.selectors.cpJson}[${this.selectors.crossProductTitle}="${title}"]`;
+      const selectorString = `${this.selectors.crossProductVariantsJson}[${this.selectors.crossProductTitle}="${title}"]`;
 
-      const cpData = JSON.parse(this.el.querySelector(selectorString).textContent);
-      return cpData;
+      const crossProductData = JSON.parse(this.el.querySelector(selectorString).textContent);
+      return crossProductData;
     } else {
-      throw new Error('Cross product title is missing');
+      console.error('Cross product title is missing');
     }
   };
 

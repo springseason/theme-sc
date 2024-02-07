@@ -21,6 +21,12 @@
 
   assign product_form_id = 'product-form-' | append: section.id
 -%}
+{% comment %}
+{% echo variants_available_arr %}
+{% echo variants_option1_arr %}
+{% echo variants_option2_arr %}
+{% echo variants_option3_arr %} {% endcomment %}
+
 
 {%- for value in option.values -%}
   {%- liquid
