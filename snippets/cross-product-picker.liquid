@@ -1,3 +1,14 @@
+{% comment %}
+  Renders cross product option picker for a cross product
+
+  Accepts:
+  - cross_products: [{Object}] cross product array of object.
+
+  Usage:
+  {% render 'cross-product-picker',
+    cross_products: cross_products,
+  %}
+{% endcomment %}
 {% assign target_metafield_key = 'custom_option.cross_sell_products' %}
 
 {%- unless cross_products == blank -%}
@@ -6,13 +17,13 @@
       <script
         type="application/json"
         data-prodify-cross-product-json
-        data-prodify-cross-product-title="{{ cross_product.title }}"
+        data-prodify-cross-product-id="{{ cross_product.id }}"
       >
         {{ cross_product | json }}
       </script>
 
       {% for cross_option in cross_product.options_with_values %}
-        <fieldset data-prodify-cross-option-container data-prodify-cross-option-current-idx="{{ variant_index }}">
+        <fieldset data-prodify-cross-option-container>
           <legend>
             {{ cross_product.title }} -
             {{ cross_option.name }}

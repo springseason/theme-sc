@@ -21,7 +21,7 @@
     name="{{ option.name }}"
     value="{{ value | escape }}"
     data-prodify-cross-product-radio
-    data-prodify-cross-product-title="{{ product.title }}"
+    data-prodify-cross-product-id="{{ product.id }}"
     {% if option.selected_value == value %}
       checked
     {% endif %}

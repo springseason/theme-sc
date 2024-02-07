@@ -97,10 +97,9 @@
       %}
 
       {%- unless cross_products == blank -%}
-        {% render 'cross-product-picker',
+        {%
+          render 'cross-product-picker',
           cross_products: cross_products,
-          product_form_id: 'product-form-id',
-          picker_type: 'radio'
         %}
       {%- endunless %}
 
