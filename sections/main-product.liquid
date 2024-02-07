@@ -141,6 +141,19 @@
             name="quantity"
             value="1"
           >
+          {% for cross_product in cross_products %}
+            {% assign cross_index = forloop.index | minus: 1 %}
+            <input
+              type="hidden"
+              name="cross-product-id_{{ cross_index }}"
+              value="{{ cross_product.selected_or_first_available_variant.id }}"
+            >
+            <input
+              type="hidden"
+              name="cross-product-quantity_{{ cross_index }}"
+              value="1"
+            >
+          {% endfor %}
           <div class="mb-[10px]">
             <button
               type="submit"

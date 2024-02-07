@@ -34,7 +34,7 @@ class Prodify {
   }
 
   initEventListeners = () => {
-    this.el.addEventListener('change', this.onOptionChange);
+    this.el.addEventListener('change', this.onOptionChange); // todo: separate p.variant change from cross product variant change
 
     if (this.quantityIncrementButton && this.quantityDecrementButton && this.quantityPresentationInput) {
       this.quantityIncrementButton.addEventListener('click', () => {
@@ -83,7 +83,6 @@ class Prodify {
     productForms.forEach((productForm) => {
       const input = productForm.querySelector('input[name="id"]');
       input.value = this.currentVariant.id;
-      // input.dispatchEvent(new Event('change', { bubbles: true }));
     });
   }
 

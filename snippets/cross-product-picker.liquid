@@ -12,8 +12,8 @@
 {% assign target_metafield_key = 'custom_option.cross_sell_products' %}
 
 {%- unless cross_products == blank -%}
-  <div class="cross-product-radios">
-    {% for cross_product in cross_products %}
+  {% for cross_product in cross_products %}
+    <div class="cross-product-options">
       <script
         type="application/json"
         data-prodify-cross-product-json
@@ -31,8 +31,8 @@
           {% render 'cross-product-options', product: cross_product, option: cross_option, picker_type: 'radio' %}
         </fieldset>
       {% endfor %}
-    {% endfor %}
-  </div>
+    </div>
+  {% endfor %}
 {% else %}
   <div>
     Please add a cross-sell product to the product's metafield:
