@@ -3,9 +3,7 @@ export default {
   component() {
     return {
       open: false,
-      init() {
-        console.log('Slayed Dropdown Component Initialized.')
-      },
+      init() {},
       toggle() {
         this.open = !this.open
       },
@@ -14,7 +12,7 @@ export default {
       },
       open() {
         this.open = true
-      },
+      }
     }
   }
 }

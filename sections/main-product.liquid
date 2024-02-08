@@ -150,6 +150,11 @@
             >
             <input
               type="hidden"
+              name="items[{{ cross_index }}][note]"
+              value="{{ product.selected_or_first_available_variant.id }}"
+            >
+            <input
+              type="hidden"
               name="items[{{ cross_index }}][quantity]"
               value="1"
             >
@@ -170,7 +175,9 @@
                   Sold out
                 {%- endif -%}
               </span>
-              <span class="hidden [[processing]_&]:block"> Adding to cart... </span>
+              <span class="hidden [[processing]_&]:block">
+                Adding to cart &nbsp <span class="loading-dots"></span>
+              </span>
             </button>
           </div>
           <div data-ajax-cart-errors="form"><!-- Error messages appear here --></div>
