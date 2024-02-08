@@ -138,6 +138,11 @@
           >
           <input
             type="hidden"
+            name="properties[is_main_product]"
+            value='true'
+          >
+          <input
+            type="hidden"
             name="quantity"
             value="1"
           >
@@ -150,7 +155,7 @@
             >
             <input
               type="hidden"
-              name="items[{{ cross_index }}][note]"
+              name="items[{{ cross_index }}]properties[main_product_id]"
               value="{{ product.selected_or_first_available_variant.id }}"
             >
             <input

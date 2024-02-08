@@ -38,7 +38,7 @@ export default {
 
       configAjaxCart() {
         window.liquidAjaxCart.conf('updateOnWindowFocus', false)
-        window.liquidAjaxCart.conf('mutations', [testMutation])
+        window.liquidAjaxCart.conf('mutations', [removeCrossProductsWithoutMain])
       },
       initLiquidAJaxCart() {
         if (window.liquidAjaxCart?.init) {
@@ -59,20 +59,35 @@ export default {
   }
 }
 
-function testMutation() {
-  if (window.liquidAjaxCart?.cart?.items?.length) {
-    console.info('Applying test mutation.')
+const isMainProduct = (item) => item.properties?.is_main_product === 'true'
+const extractMainProductIds = (cart) => cart?.items?.filter(isMainProduct)?.map((item) => item.id)
 
-    return {
-      requests: [
-        {
-          type: 'change',
-          body: {
-            line: 1,
-            quantity: 0
-          }
-        }
-      ]
-    }
+const removeCrossProductsWithoutMain = () => {
+  const cart = window?.liquidAjaxCart?.cart
+
+  if (!cart) {
+    console.error('Ajax cart mutation error: ', `${cart} - not found.`)
+    return null
   }
+
+  const mainProductIds = extractMainProductIds(cart)
+
+  const requests = cart.items.reduce((acc, item) => {
+    const hasMainProductId = item.properties?.main_product_id?.length
+    const hasMainInCart = mainProductIds?.includes(parseInt(item.properties.main_product_id))
+
+    if (!isMainProduct(item) && hasMainProductId && !hasMainInCart) {
+      acc.push({
+        type: 'change',
+        body: {
+          id: item.key,
+          quantity: 0
+        }
+      })
+    }
+
+    return acc
+  }, [])
+
+  return requests.length ? { requests } : null
 }
