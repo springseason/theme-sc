@@ -139,17 +139,19 @@
           <input
             type="hidden"
             name="properties[is_main_product]"
-            value='true'
+            value="true"
           >
           <input
             type="hidden"
             name="quantity"
             value="1"
           >
+          {% comment %} Cross product inputs {% endcomment %}
           {% for cross_product in cross_products %}
             {% assign cross_index = forloop.index | minus: 1 %}
             <input
               type="hidden"
+              id="cp-{{ cross_product.id }}"
               name="items[{{ cross_index }}][id]"
               value="{{ cross_product.selected_or_first_available_variant.id }}"
             >

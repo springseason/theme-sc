@@ -86,6 +86,25 @@ class Prodify {
     })
   }
 
+  updateCrossProductVariantIdInput(event) {
+    const crossProductId = event.target.getAttribute(this.selectors.crossProductId)
+    const currentCrossProductOptions = Array.from(
+      this.el.querySelectorAll(`input[data-prodify-cross-product-id="${crossProductId}"]:checked`)
+    )?.map((el) => el.value)
+
+    const crossProduct = this.getCrossProductData(crossProductId)
+
+    const variant = crossProduct.variants.find((v) =>
+      window.sourcherry.helpers.arraysAreEqual(v.options, currentCrossProductOptions)
+    )
+    const productForm = document.querySelector(this.selectors.productForm)
+    const formInput = productForm.querySelector(`input[id="cp-${crossProduct.id}"]`)
+
+    if (formInput) {
+      formInput.value = variant.id
+    }
+  }
+
   updateURL() {
     if (!this.currentVariant || this.el.dataset.updateUrl === 'false') return
     window.history.replaceState({}, '', `${this.el.dataset.url}?variant=${this.currentVariant.id}`)
@@ -120,6 +139,7 @@ class Prodify {
       event.target.hasAttribute('data-prodify-cross-product-radio') &&
       event.target.hasAttribute(this.selectors.crossProductId)
     ) {
+      this.updateCrossProductVariantIdInput(event)
       return this.updateTotalPrice()
     }
 

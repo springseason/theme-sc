@@ -2,13 +2,13 @@
   Renders cross product options for a cross product
 
   Accepts:
-  - product: {Object} cross product object.
+  - cross_product: {Object} cross product object.
   - option: {Object} current cross product_option object.
   - picker_type: 'radio'
 
   Usage:
   {% render 'cross-product-options',
-    product: cross_product,
+    cross_product: cross_product,
     option: cross_option,
     picker_type: 'radio'
   %}
@@ -17,11 +17,12 @@
 {%- for value in option.values -%}
   <input
     type="radio"
-    id="{{ section.id }}-cross-option-{{product.tags.first}}-{{ option.position }}-{{ forloop.index0 }}"
+    {% comment %} 💡 ?: id - option idx - value idx {% endcomment %}
+    id="{{ section.id }}__cross-option--{{ cross_product.id }}-{{ option.position | minus: 1 }}-{{ forloop.index0 }}"
     name="{{ option.name }}"
     value="{{ value | escape }}"
     data-prodify-cross-product-radio
-    data-prodify-cross-product-id="{{ product.id }}"
+    data-prodify-cross-product-id="{{ cross_product.id }}"
     {% if option.selected_value == value %}
       checked
     {% endif %}
@@ -32,11 +33,11 @@
     {% endif %}
   >
   <label
-    for="{{ section.id }}-cross-option-{{product.tags.first}}-{{ option.position }}-{{ forloop.index0 }}"
+    for="{{ section.id }}__cross-option--{{ cross_product.id }}-{{ option.position | minus: 1 }}-{{ forloop.index0 }}"
     @keyup.enter="$el.click()"
     class="bg-slate-100 text-black"
   >
     {{ value -}}
-    <span class="visually-hidden sr-only">{{ 'products.product.variant_sold_out_or_unavailable' | t }}</span>
+    {% comment %} <span class="visually-hidden sr-only">{{ 'products.product.variant_sold_out_or_unavailable' | t }}</span> {% endcomment %}
   </label>
 {%- endfor -%}

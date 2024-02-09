@@ -15,7 +15,7 @@ export default {
     let event = new CustomEvent(type, {
       bubbles: true,
       cancelable: true,
-      detail: detail,
+      detail: detail
     })
 
     return elem.dispatchEvent(event)
@@ -33,11 +33,17 @@ export default {
   truncateLongTitle(input) {
     return input.length > 5 ? `${input.substring(0, 18)}...` : input
   },
+  arraysAreEqual(arr1, arr2) {
+    return (
+      arr1.length === arr2.length &&
+      arr1.reduce((acc, currentValue, index) => acc && currentValue === arr2[index], true)
+    )
+  },
   async fetchHTML(endpoint) {
     return await fetch(endpoint)
       .then((response) => response.text())
       .then((responseText) => {
         return new DOMParser().parseFromString(responseText, 'text/html')
       })
-  },
+  }
 }
