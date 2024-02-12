@@ -1,6 +1,12 @@
 class Prodify {
   constructor(settings) {
+    this.helpers = window.sourcherry.helpers
     this.settings = { ...settings }
+    this.initializeElements()
+    this.bindEventListeners()
+  }
+
+  initializeElements() {
     this.el = document.querySelector('[data-prodify]')
     this.pickerType = this.el.dataset.prodify
 
@@ -14,7 +20,8 @@ class Prodify {
       quantityIncrement: '[data-prodify-quantity-increment]',
       quantityDecrement: '[data-prodify-quantity-decrement]',
       quantityPresentation: '[data-prodify-quantity-presentation]',
-      crossProductId: 'data-prodify-cross-product-id' // ! no brackets
+      crossProductId: 'data-prodify-cross-product-id', // ! no brackets
+      crossProductInput: 'data-prodify-cross-product-radio' // ! no brackets
     }
 
     this.textStrings = {
@@ -30,33 +37,21 @@ class Prodify {
     this.quantityHiddenInput = this.el.querySelector('input[name="quantity"]')
 
     this.updateTotalPrice()
-    this.initEventListeners()
   }
-
-  initEventListeners = () => {
-    this.el.addEventListener('change', this.onOptionChange) // todo: separate p.variant change from cross product variant change
-
+  bindEventListeners() {
+    this.el.addEventListener('change', this.onOptionChange)
     if (this.quantityIncrementButton && this.quantityDecrementButton && this.quantityPresentationInput) {
-      this.quantityIncrementButton.addEventListener('click', () => {
-        this.updateQuantity('up')
-      })
-
-      this.quantityDecrementButton.addEventListener('click', () => {
-        this.updateQuantity('down')
-      })
+      this.quantityIncrementButton.addEventListener('click', () => this.updateQuantity('up'))
+      this.quantityDecrementButton.addEventListener('click', () => this.updateQuantity('down'))
     }
   }
-
-  updateQuantity = (stepDirection) => {
+  updateQuantity(stepDirection) {
     const adjustQuantity = (direction) => (quantity) => Math.max(1, quantity + direction)
-
     const previousQuantity = parseInt(this.quantityPresentationInput.value)
     const newQuantity = adjustQuantity(stepDirection === 'up' ? 1 : -1)(previousQuantity)
-
     this.quantityHiddenInput.value = this.quantityPresentationInput.value = newQuantity
   }
-
-  updateCurrentVariant = () => {
+  updateCurrentVariant() {
     const variants = this.getVariantData()
     const matchingVariant = variants.find((variant) => {
       return variant.options.every((option, index) => {
@@ -65,19 +60,16 @@ class Prodify {
     })
     this.currentVariant = matchingVariant
   }
-
-  updateCurrentOptions = () => {
+  updateCurrentOptions() {
     if (this.pickerType == 'select') {
       this.options = Array.from(this.el.querySelectorAll('select'), (select) => select.value)
       return
     }
-
     this.optionContainers = Array.from(this.el.querySelectorAll(this.selectors.optionContainer))
     this.options = this.optionContainers.map((optionContainer) => {
       return Array.from(optionContainer.querySelectorAll('input')).find((radio) => radio.checked).value
     })
   }
-
   updateVariantIdInput() {
     const productForms = document.querySelectorAll(this.selectors.productForm)
     productForms.forEach((productForm) => {
@@ -85,31 +77,10 @@ class Prodify {
       input.value = this.currentVariant.id
     })
   }
-
-  updateCrossProductVariantIdInput(event) {
-    const crossProductId = event.target.getAttribute(this.selectors.crossProductId)
-    const currentCrossProductOptions = Array.from(
-      this.el.querySelectorAll(`input[data-prodify-cross-product-id="${crossProductId}"]:checked`)
-    )?.map((el) => el.value)
-
-    const crossProduct = this.getCrossProductData(crossProductId)
-
-    const variant = crossProduct.variants.find((v) =>
-      window.sourcherry.helpers.arraysAreEqual(v.options, currentCrossProductOptions)
-    )
-    const productForm = document.querySelector(this.selectors.productForm)
-    const formInput = productForm.querySelector(`input[id="cp-${crossProduct.id}"]`)
-
-    if (formInput) {
-      formInput.value = variant.id
-    }
-  }
-
   updateURL() {
     if (!this.currentVariant || this.el.dataset.updateUrl === 'false') return
     window.history.replaceState({}, '', `${this.el.dataset.url}?variant=${this.currentVariant.id}`)
   }
-
   updateAddButtonDom(disable = true, text, modifyClass = true) {
     const productForm = document.querySelector(this.selectors.productForm)
     if (!productForm) return
@@ -122,7 +93,7 @@ class Prodify {
       if (text) addButtonText.textContent = text
     } else {
       addButton.removeAttribute('disabled')
-      addButtonText.textContent = this.textStrings.addButtonTextUnavailable
+      addButtonText.textContent = this.textStrings.addToCart
     }
 
     if (!modifyClass) return
@@ -133,30 +104,6 @@ class Prodify {
       addButton.classList.remove('disabled')
     }
   }
-
-  onOptionChange = (event) => {
-    if (
-      event.target.hasAttribute('data-prodify-cross-product-radio') &&
-      event.target.hasAttribute(this.selectors.crossProductId)
-    ) {
-      this.updateCrossProductVariantIdInput(event)
-      return this.updateTotalPrice()
-    }
-
-    this.updateCurrentOptions()
-    this.updateCurrentVariant()
-    this.updateAddButtonDom(true, '', false)
-    this.compareInputValues()
-    this.setOptionSelected(event.target)
-    if (!this.currentVariant) {
-      this.updateAddButtonDom(true, this.textStrings.addButtonTextUnavailable, true)
-    } else {
-      this.updateURL()
-      this.updateVariantIdInput()
-      this.swapProductInfo(this.updateTotalPrice)
-    }
-  }
-
   setOptionSelected(select) {
     if (this.pickerType == 'select') {
       const options = Array.from(select.querySelectorAll('option'))
@@ -171,7 +118,6 @@ class Prodify {
       })
     }
   }
-
   compareInputValues() {
     const variantsMatchingOptionOneSelected = this.variantData.filter(
       // Grab the first checked input and compare it to the variant option1
@@ -195,7 +141,6 @@ class Prodify {
       this.setInputAvailability(optionInputs, availableOptionInputsValues, existingOptionInputsValues)
     })
   }
-
   setInputAvailability(optionInputs, availableOptionInputValues, existingOptionInputsValues) {
     optionInputs.forEach((input) => {
       if (availableOptionInputValues.includes(input.getAttribute('value'))) {
@@ -224,51 +169,6 @@ class Prodify {
       }
     })
   }
-
-  updateTotalPrice = () => {
-    const totalPriceEl = this.el.querySelector('#total-price')
-    if (!totalPriceEl) {
-      return
-    } else if (!totalPriceEl.textContent) {
-      return console.error('total price el not found')
-    }
-
-    const regularPriceEl = this.el.querySelector('#regular-price')
-    if (!regularPriceEl || !regularPriceEl.textContent) {
-      return console.error('regular price el not found')
-    }
-
-    const currentCrossProductOptionEls = Array.from(
-      this.el.querySelectorAll(`input[data-prodify-cross-product-radio]:checked`)
-    )
-
-    // [{ productId: variantTitle }, ...]
-    const groupedData = currentCrossProductOptionEls.reduce((acc, node) => {
-      const cpId = node.getAttribute(this.selectors.crossProductId)
-      const variantOption = node.getAttribute('value')
-      acc[cpId] = acc[cpId] ? `${acc[cpId]} / ${variantOption}` : variantOption
-      return acc
-    }, {})
-
-    // { variantTitle: { price, ... other FE data }}
-    const priceByProductId = Object.entries(groupedData).reduce((acc, [cpId, variantTitle]) => {
-      const product = this.getCrossProductData(cpId)
-      const currentVariantData = product.variants.find((v) => v.title === variantTitle)
-
-      return {
-        ...acc,
-        [variantTitle]: {
-          price: this.parseShopifyPrice(currentVariantData.price),
-          available: currentVariantData.available
-        }
-      }
-    }, {})
-
-    const regularPrice = this.parseMoneyString(regularPriceEl.textContent)
-    const totalCrossPrice = Object.values(priceByProductId).reduce((acc, val) => acc + val.price, 0)
-    totalPriceEl.textContent = this.formatCurrency(regularPrice.currency)(regularPrice.amount + totalCrossPrice)
-  }
-
   swapProductInfo = (callback) => {
     window.sourcherry.helpers
       .fetchHTML(`${this.el.dataset.url}?variant=${this.currentVariant.id}&section_id=${this.el.dataset.section}`)
@@ -294,12 +194,10 @@ class Prodify {
       })
       .then(() => callback())
   }
-
   getVariantData = () => {
     this.variantData = this.variantData || JSON.parse(this.el.querySelector(this.selectors.variantsJson).textContent)
     return this.variantData
   }
-
   getCrossProductData = (id) => {
     if (typeof id !== 'string') return console.error('Cross product ID is missing')
 
@@ -312,59 +210,164 @@ class Prodify {
 
     return JSON.parse(crossProductDataEl.textContent)
   }
-
-  // Money handling
-  splitStringAtPosition = (position) => (str) => {
-    // Check if the first character is not a number
-    if (!/^\d/.test(str.charAt(0))) {
-      return [str.slice(0, position), str.slice(position)]
-    } else {
-      // If the first character is a number, do not split
-      return [str]
+  updateTotalPrice = () => {
+    const totalPriceEl = this.el.querySelector('#total-price')
+    if (!totalPriceEl || !totalPriceEl.textContent) {
+      return console.error('total price el not found')
     }
-  }
-  formatCurrency = (currency) => (amount) => `${currency}${amount.toLocaleString('en-UK')}`
-  sanitizeAndTrim = (str) => str.trim().replace(/,/g, '.')
-  parseShopifyPrice = (amount) => Number((amount / 100).toFixed(2))
-  parseMoneyString = (moneyString) => {
-    if (typeof moneyString !== 'string') {
-      return {}
+    const regularPriceEl = this.el.querySelector('#regular-price')
+    if (!regularPriceEl || !regularPriceEl.textContent) {
+      return console.error('regular price el not found')
     }
+    const regularPrice = this.helpers.parseMoneyString(regularPriceEl.textContent)
 
-    const trimmedString = this.sanitizeAndTrim(moneyString)
-
-    // Check if the string is not empty after trimming
-    if (!trimmedString) {
-      return {}
+    const currentCrossProductOptionEls = Array.from(
+      this.el.querySelectorAll(`input[${this.selectors.crossProductInput}]:checked`)
+    )
+    if (!currentCrossProductOptionEls.length) {
+      return console.error('No cross product options selected.')
     }
 
-    // Use a regular expression to match currency symbols and split the string
-    const match = trimmedString.match(/([^\d]*)(\d+\.?\d*)/)
+    // [{ productId: variantTitle }, ...]
+    const groupedData = currentCrossProductOptionEls.reduce((acc, node) => {
+      const cpId = node.getAttribute(this.selectors.crossProductId)
+      const variantOption = node.getAttribute('value')
+      acc[cpId] = acc[cpId] ? `${acc[cpId]} / ${variantOption}` : variantOption
+      return acc
+    }, {})
 
-    if (match) {
-      const currency = match[1]
-      const amount = parseFloat(match[2])
+    // { variantTitle: { price, ... other FE data }}
+    const priceByProductId = Object.entries(groupedData).reduce((acc, [cpId, variantTitle]) => {
+      const product = this.getCrossProductData(cpId)
+      const currentVariantData = product.variants.find((v) => v.title === variantTitle)
 
       return {
-        currency,
-        amount: isNaN(amount) ? 0 : amount // Ensure amount is a valid number
+        ...acc,
+        [variantTitle]: this.helpers.parseShopifyPrice(currentVariantData.price)
       }
-    }
+    }, {})
 
-    return {}
+    const totalCrossPrice = Object.values(priceByProductId).reduce((acc, val) => acc + val, 0)
+    totalPriceEl.textContent = this.helpers.formatCurrency(regularPrice.currency)(regularPrice.amount + totalCrossPrice)
+  }
+  getCurrentCrossProductVariant(event) {
+    const crossProductId = event.target.getAttribute(this.selectors.crossProductId)
+    const crossProduct = this.getCrossProductData(crossProductId)
+
+    const currentCrossProductOptionEls = Array.from(
+      this.el.querySelectorAll(`input[data-prodify-cross-product-id="${crossProductId}"]:checked`)
+    )
+    const currentCrossProductOptionLabels = currentCrossProductOptionEls?.map((el) => el.value)
+
+    const currentCrossProductVariant = crossProduct.variants?.find((variant) =>
+      this.helpers.arraysAreEqual(variant.options, currentCrossProductOptionLabels)
+    )
+
+    return currentCrossProductVariant
   }
 
-  compose =
-    (...fns) =>
-    (arg) =>
-      fns.reduceRight((acc, fn) => fn(acc), arg)
+  updateCrossProductVariantIdInput(event) {
+    const crossProductId = event.target.getAttribute(this.selectors.crossProductId)
+    const currentVariant = this.getCurrentCrossProductVariant(event)
 
-  pipe =
-    (...fns) =>
-    (arg) =>
-      fns.reduce((acc, fn) => fn(acc), arg)
+    const productForm = document.querySelector(this.selectors.productForm)
+    if (!productForm) return
 
-  // ... (rest of the helper methods)
+    const formInput = productForm.querySelector(`input[id="cp-${crossProductId}"]`)
+
+    if (formInput) {
+      formInput.value = currentVariant.id
+    }
+  }
+  updateCrossProductAvailability(event) {
+    const crossProductId = event?.target?.getAttribute(this.selectors.crossProductId)
+    const optionId = event?.target?.id
+
+    if (!crossProductId) {
+      console.error('Cross product ID is missing')
+      return
+    }
+    if (!optionId) {
+      console.error('Option ID is missing')
+      return
+    }
+
+    const currentOptionPosition = this.getOptionPosi(optionId)
+    if (!(currentOptionPosition >= 1 && currentOptionPosition <= 3)) {
+      console.error('Invalid option position')
+      return
+    }
+
+    const crossProduct = this.getCrossProductData(crossProductId)
+    if (!crossProduct) {
+      console.error(`Cross product data for ID ${crossProductId} is missing`)
+      return
+    }
+
+    const selector = `input[${this.selectors.crossProductId}="${crossProductId}"]`
+    const checkedInputEls = Array.from(this.el.querySelectorAll(selector + ':checked'))
+    const currentValues = checkedInputEls.map((el) => el.value)
+    const inputEls = Array.from(this.el.querySelectorAll(selector))
+
+    const baseUnav = crossProduct.variants.filter(
+      (vari) => vari[`option${currentOptionPosition}`] === event.target.value && !vari.available
+    )
+    inputEls.forEach((el) => {
+      const inputPosition = this.getOptionPosi(el.id)
+      el.classList.remove('disabled')
+
+      if (inputPosition === currentOptionPosition) {
+        return
+      }
+
+      // switch (currentOptionPosition) {
+      //   case 1:
+      //     const unv = baseUnav.filter((vari) => vari.option2 === el.value)
+      //     if (unv.length) {
+      //       el.classList.add('disabled')
+      //     }
+      //     return
+      //   case 2:
+      //     console.log(baseUnav)
+      //     return
+      //   case 3:
+      //     console.log(baseUnav)
+      //     return
+      // }
+
+      console.log('base', baseUnav)
+      console.log('ext', unav)
+    })
+  }
+
+  onOptionChange = (event) => {
+    if (
+      event.target.hasAttribute(this.selectors.crossProductId) &&
+      event.target.hasAttribute(this.selectors.crossProductInput)
+    ) {
+      // this.updateCrossProductAvailability(event)
+      this.updateCrossProductVariantIdInput(event)
+      this.updateTotalPrice()
+      return
+    }
+
+    this.updateCurrentOptions()
+    this.updateCurrentVariant()
+    this.updateAddButtonDom(true, '', false)
+    this.compareInputValues()
+    this.setOptionSelected(event.target)
+    if (!this.currentVariant) {
+      this.updateAddButtonDom(true, this.textStrings.addButtonTextUnavailable, true)
+    } else {
+      this.updateURL()
+      this.updateVariantIdInput()
+      this.swapProductInfo(this.updateTotalPrice)
+    }
+  }
+
+  getOptionPosi(optionId) {
+    return parseInt(optionId.slice(-3).split('-')[0]) + 1
+  }
 }
 
 window.prodify = new Prodify()

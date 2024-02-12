@@ -45,5 +45,41 @@ export default {
       .then((responseText) => {
         return new DOMParser().parseFromString(responseText, 'text/html')
       })
+  },
+  formatCurrency(currency) {
+    return (amount) => `${currency}${amount.toLocaleString('en-UK')}`
+  },
+  sanitizeAndTrim(str) {
+    return str.trim().replace(/,/g, '.')
+  },
+  parseShopifyPrice(amount) {
+    return Number((amount / 100).toFixed(2))
+  },
+  parseMoneyString(moneyString) {
+    if (typeof moneyString !== 'string') {
+      return {}
+    }
+
+    const trimmedString = this.sanitizeAndTrim(moneyString)
+
+    // Check if the string is not empty after trimming
+    if (!trimmedString) {
+      return {}
+    }
+
+    // Use a regular expression to match currency symbols and split the string
+    const match = trimmedString.match(/([^\d]*)(\d+\.?\d*)/)
+
+    if (match) {
+      const currency = match[1]
+      const amount = parseFloat(match[2])
+
+      return {
+        currency,
+        amount: isNaN(amount) ? 0 : amount // Ensure amount is a valid number
+      }
+    }
+
+    return {}
   }
 }
