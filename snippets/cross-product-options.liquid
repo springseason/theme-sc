@@ -19,7 +19,7 @@
     type="radio"
     {% comment %} 💡 ?: id - option idx - value idx {% endcomment %}
     id="{{ section.id }}__cross-option--{{ cross_product.id }}-{{ option.position | minus: 1 }}-{{ forloop.index0 }}"
-    name="{{ option.name }}"
+    name="cp-{{cross_product.id}}-{{ option.name }}"
     value="{{ value | escape }}"
     data-prodify-cross-product-radio
     data-prodify-cross-product-id="{{ cross_product.id }}"
