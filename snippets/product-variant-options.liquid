@@ -70,7 +70,7 @@
       {% endif %}
       {% if option_not_exist %}
         disabled
-        class="hidden [&+label]:bg-transparent [&+label]:text-gray-300"
+        class="hidden [&+label]:bg-transparent [&+label]:text-gray-300 [&+label]:!cursor-default"
       {% elsif option_out_of_stock %}
         class="out-of-stock hidden [&:checked+label]:bg-indigo-900 [&:checked+label]:text-white"
       {% else %}
