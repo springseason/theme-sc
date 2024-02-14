@@ -14,7 +14,48 @@
   %}
 {% endcomment %}
 
+{%- liquid
+  assign variants_available_arr = cross_product.variants | map: 'available'
+  assign variants_option1_arr = cross_product.variants | map: 'option1'
+  assign variants_option2_arr = cross_product.variants | map: 'option2'
+  assign variants_option3_arr = cross_product.variants | map: 'option3'
+-%}
+
 {%- for value in option.values -%}
+  {%- liquid
+    assign option_not_exist = true
+    assign option_out_of_stock = true
+
+    for option1_name in variants_option1_arr
+      case option.position
+        when 1
+          if variants_option1_arr[forloop.index0] == value
+            assign option_not_exist = false
+
+            if variants_available_arr[forloop.index0]
+              assign option_out_of_stock = false
+            endif
+          endif
+        when 2
+          if option1_name == product.selected_or_first_available_variant.option1 and variants_option2_arr[forloop.index0] == value
+            assign option_not_exist = false
+
+            if variants_available_arr[forloop.index0]
+              assign option_out_of_stock = false
+            endif
+          endif
+        when 3
+          if option1_name == product.selected_or_first_available_variant.option1 and variants_option2_arr[forloop.index0] == product.selected_or_first_available_variant.option2 and variants_option3_arr[forloop.index0] == value
+            assign option_not_exist = false
+
+            if variants_available_arr[forloop.index0]
+              assign option_out_of_stock = false
+            endif
+          endif
+      endcase
+    endfor
+  -%}
+
   <input
     type="radio"
     {% comment %} 💡 ?: id - option idx - value idx {% endcomment %}
@@ -26,8 +67,12 @@
     {% if option.selected_value == value %}
       checked
     {% endif %}
-    {% if option_disabled %}
-      class="disabled hidden [&:checked+label]:bg-indigo-900 [&:checked+label]:text-white"
+
+    {% if option_not_exist %}
+      disabled
+      class="hidden [&+label]:bg-transparent [&+label]:text-gray-300"
+    {% elsif option_out_of_stock %}
+      class="out-of-stock hidden [&:checked+label]:bg-indigo-900 [&:checked+label]:text-white"
     {% else %}
       class="hidden [&:checked+label]:bg-indigo-900 [&:checked+label]:text-white"
     {% endif %}
