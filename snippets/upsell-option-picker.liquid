@@ -39,14 +39,16 @@
             {% endif %}
           >
           <label for="{{ id }}" class="bg-slate-100 text-black !inline-flex items-center gap-2">
-            <img
-              class="h-4 w-auto"
-              src="{{ option.icon | image_url }}"
-              alt="{{ option.name | escape }}'s logo"
-              width="16"
-              height="16"
-              loading="eager"
-            >
+            {% if option.icon %}
+              <img
+                class="h-4 w-auto"
+                src="{{ option.icon | image_url }}"
+                alt="{{ option.name | escape }}'s logo"
+                width="16"
+                height="16"
+                loading="eager"
+              >
+            {% endif %}
             {{- option.title | escape -}}
           </label>
           <script type="application/json" data-prodify-upsell-option="{{ sanitized_title }}">

@@ -257,11 +257,15 @@ class Prodify {
     // { variantTitle: { price, ... other FE data }}
     const priceByProductId = Object.entries(groupedData).reduce((acc, [cpId, variantTitle]) => {
       const product = this.getCrossProductData(cpId)
-      const currentVariantData = product.variants.find((v) => v.title === variantTitle)
+      const currentVariant = product.variants.find((v) => v.title === variantTitle)
 
+      if (!currentVariant || !currentVariant.id) {
+        console.error('Current variant id not found.')
+        return
+      }
       return {
         ...acc,
-        [variantTitle]: this.helpers.parseShopifyPrice(currentVariantData.price)
+        [variantTitle]: this.helpers.parseShopifyPrice(currentVariant.price)
       }
     }, {})
 
@@ -298,6 +302,11 @@ class Prodify {
   updateCrossProductVariantIdInput(event) {
     const crossProductId = event.target.getAttribute(this.selectors.crossProductId)
     const currentVariant = this.getCurrentCrossProductVariant(event)
+
+    if (!currentVariant || !currentVariant.id) {
+      console.error('Current variant id not found')
+      return
+    }
 
     const productForm = document.querySelector(this.selectors.productForm)
     if (!productForm) return

@@ -81,6 +81,7 @@
           {{ product.selected_or_first_available_variant.price | money }}
         </span>
       </div>
+
       {% assign cross_products = product.metafields.custom_option.cross_sell_products.value %}
       {% unless cross_products == blank %}
         <div class="flex items-center py-2">
@@ -95,8 +96,6 @@
         product_form_id: 'product-form-id',
         picker_type: section.settings.picker_type
       %}
-
-      {% render 'upsell-option-picker', upsells: product.metafields.custom.upsells.value %}
       {%
         render 'cross-product-picker',
         cross_products: cross_products,
