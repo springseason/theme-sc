@@ -9,6 +9,7 @@
     cross_products: cross_products,
   %}
 {% endcomment %}
+
 {% assign target_metafield_key = 'custom_option.cross_sell_products' %}
 
 {%- unless cross_products == blank -%}
@@ -23,7 +24,7 @@
       </script>
 
       {% for cross_option in cross_product.options_with_values %}
-        <fieldset data-prodify-cross-option-container>
+        <fieldset>
           <legend>
             {{ cross_product.title }} -
             {{ cross_option.name }}

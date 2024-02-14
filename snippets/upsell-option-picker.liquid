@@ -1,0 +1,59 @@
+{% comment %}
+  Renders upsell options picker for a product
+
+  Accepts:
+  - upsells: [{Object}] product upsell options array of object.
+
+  Usage:
+  {% render 'upsell-option-picker',
+    upsells: product.metafields.custom.upsells.value,
+  %}
+{% endcomment %}
+
+{% unless upsells == blank %}
+  <div class="upsell-options w-full border-b my-2">
+    {% for upsell in upsells %}
+      {% assign default_selected = upsell.default_selected | default: 0 %}
+      {% assign sanitized_label = upsell.label | escape | replace: ' ', '_' | downcase %}
+      {% assign option_name = 'uo--' | append: sanitized_label %}
+
+      <fieldset name="{{ option_name }}">
+        <legend>{{ upsell.label }}</legend>
+        {% for option in upsell.options.value %}
+          {% assign sanitized_title = option.title | replace: ' ', '_' | downcase %}
+          {% assign id = section.id
+            | append: '__uo--'
+            | append: sanitized_label
+            | append: '--'
+            | append: forloop.index0
+          %}
+          <input
+            type="radio"
+            id="{{ id }}"
+            name="{{ option_name }}"
+            value="{{ sanitized_title }}"
+            data-prodify-upsell-option-radio
+            class="hidden [&:checked+label]:bg-indigo-900 [&:checked+label]:text-white"
+            {% if forloop.index0 == default_selected %}
+              checked
+            {% endif %}
+          >
+          <label for="{{ id }}" class="bg-slate-100 text-black !inline-flex items-center gap-2">
+            <img
+              class="h-4 w-auto"
+              src="{{ option.icon | image_url }}"
+              alt="{{ option.name | escape }}'s logo"
+              width="16"
+              height="16"
+              loading="eager"
+            >
+            {{- option.title | escape -}}
+          </label>
+          <script type="application/json" data-prodify-upsell-option="{{ sanitized_title }}">
+            {{- option | json -}}
+          </script>
+        {% endfor %}
+      </fieldset>
+    {% endfor %}
+  </div>
+{% endunless %}

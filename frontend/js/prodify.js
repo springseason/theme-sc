@@ -21,7 +21,8 @@ class Prodify {
       quantityDecrement: '[data-prodify-quantity-decrement]',
       quantityPresentation: '[data-prodify-quantity-presentation]',
       crossProductId: 'data-prodify-cross-product-id', // ! no brackets
-      crossProductInput: 'data-prodify-cross-product-radio' // ! no brackets
+      crossProductInput: 'data-prodify-cross-product-radio', // ! no brackets
+      upsellOptionInput: 'data-prodify-upsell-option-radio' // ! no brackets
     }
 
     this.textStrings = {
@@ -36,7 +37,24 @@ class Prodify {
     this.quantityPresentationInput = this.el.querySelector(this.selectors.quantityPresentation)
     this.quantityHiddenInput = this.el.querySelector('input[name="quantity"]')
 
+    this.upsellOptionEls = Array.from(this.el.querySelectorAll('.upsell-options > fieldset'))
+    this.upsellOptions = this.upsellOptionEls.map((el) => el.name)
+
+    this.currUOs = this.upsellOptionEls.reduce((acc, fieldset) => {
+      const optionName = fieldset.name
+      const checkedInput = fieldset.querySelector('input:checked')
+      if (checkedInput) {
+        return { ...acc, [optionName]: this.getUpsellOptionData(checkedInput.value) }
+      }
+      return acc
+    }, {})
+
     this.updateTotalPrice()
+  }
+  getUpsellOptionData(optionValue) {
+    const sel = `script[data-prodify-upsell-option="${optionValue}"]`
+    const dataEls = this.el.querySelector(sel)
+    return JSON.parse(dataEls.textContent)
   }
   bindEventListeners() {
     this.el.addEventListener('change', this.onOptionChange)
@@ -248,7 +266,18 @@ class Prodify {
     }, {})
 
     const totalCrossPrice = Object.values(priceByProductId).reduce((acc, val) => acc + val, 0)
-    totalPriceEl.textContent = this.helpers.formatCurrency(regularPrice.currency)(regularPrice.amount + totalCrossPrice)
+
+    const totalUpsellPrice = Object.values(this.currUOs).reduce((acc, val) => {
+      const priceAmount = val?.price?.amount
+      if (typeof priceAmount === 'string' || typeof priceAmount === 'number') {
+        return acc + (typeof priceAmount === 'string' ? parseInt(priceAmount) : priceAmount)
+      }
+      return acc
+    }, 0)
+
+    totalPriceEl.textContent = this.helpers.formatCurrency(regularPrice.currency)(
+      regularPrice.amount + totalCrossPrice + totalUpsellPrice
+    )
   }
   getCurrentCrossProductVariant(event) {
     const crossProductId = event.target.getAttribute(this.selectors.crossProductId)
@@ -347,6 +376,12 @@ class Prodify {
     ) {
       // this.updateCrossProductAvailability(event)
       this.updateCrossProductVariantIdInput(event)
+      this.updateTotalPrice()
+      return
+    }
+
+    if (event.target.hasAttribute(this.selectors.upsellOptionInput)) {
+      this.currUOs[event.target.name] = this.getUpsellOptionData(event.target.value)
       this.updateTotalPrice()
       return
     }
