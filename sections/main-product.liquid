@@ -33,7 +33,7 @@
   data-prodify="{{ section.settings.picker_type }}"
 >
   <script type="application/json" data-prodify-variants-json>
-    {{ product.variants | json }}
+    {{- product.variants | json -}}
   </script>
 
   <a class="skip-to-content-link" href="#product-info-{{ section.id }}"> Skip to product info </a>
@@ -197,7 +197,7 @@
 </div>
 
 <style>
-  input[type='radio'].disabled + label {
+  input[type='radio'].out-of-stock + label {
     text-decoration: line-through;
   }
 
@@ -299,12 +299,6 @@
     input:focus
     + label {
     outline: #08f auto 2px;
-  }
-
-  .section-main-product .shopify-section-main-product-inner .flex .info fieldset label[data-unavailable='true'],
-  .section-main-product .shopify-section-main-product-inner .flex .info fieldset input[disabled] + label {
-    background-color: transparent;
-    color: lightgray;
   }
 
   .section-main-product .shopify-section-main-product-inner .flex .info .quantity-row label {

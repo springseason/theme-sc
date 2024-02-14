@@ -166,14 +166,14 @@ class Prodify {
           input.innerText = input.getAttribute('value')
           return
         }
-        input.classList.remove('disabled')
+        input.classList.remove('out-of-stock')
       } else {
         if (existingOptionInputsValues.includes(input.getAttribute('value'))) {
           if (this.pickerType == 'select') {
             input.innerText = this.textStrings.soldOutVariantValueLabel.replace('[value]', input.getAttribute('value'))
             return
           }
-          input.classList.add('disabled')
+          input.classList.add('out-of-stock')
         } else {
           if (this.pickerType == 'select') {
             input.innerText = this.textStrings.unavailableVariantValueLabel.replace(

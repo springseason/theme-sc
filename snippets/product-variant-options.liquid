@@ -21,17 +21,11 @@
 
   assign product_form_id = 'product-form-' | append: section.id
 -%}
-{% comment %}
-{% echo variants_available_arr %}
-{% echo variants_option1_arr %}
-{% echo variants_option2_arr %}
-{% echo variants_option3_arr %} {% endcomment %}
-
 
 {%- for value in option.values -%}
   {%- liquid
     assign option_not_exist = true
-    assign option_unavailable = true
+    assign option_out_of_stock = true
 
     for option1_name in variants_option1_arr
       case option.position
@@ -40,7 +34,7 @@
             assign option_not_exist = false
 
             if variants_available_arr[forloop.index0]
-              assign option_unavailable = false
+              assign option_out_of_stock = false
             endif
           endif
         when 2
@@ -48,7 +42,7 @@
             assign option_not_exist = false
 
             if variants_available_arr[forloop.index0]
-              assign option_unavailable = false
+              assign option_out_of_stock = false
             endif
           endif
         when 3
@@ -56,7 +50,7 @@
             assign option_not_exist = false
 
             if variants_available_arr[forloop.index0]
-              assign option_unavailable = false
+              assign option_out_of_stock = false
             endif
           endif
       endcase
@@ -74,8 +68,11 @@
       {% if option.selected_value == value %}
         checked
       {% endif %}
-      {% if option_disabled %}
-        class="disabled hidden [&:checked+label]:bg-indigo-900 [&:checked+label]:text-white"
+      {% if option_not_exist %}
+        disabled
+        class="hidden [&+label]:bg-transparent [&+label]:text-gray-300"
+      {% elsif option_out_of_stock %}
+        class="out-of-stock hidden [&:checked+label]:bg-indigo-900 [&:checked+label]:text-white"
       {% else %}
         class="hidden [&:checked+label]:bg-indigo-900 [&:checked+label]:text-white"
       {% endif %}
@@ -84,7 +81,7 @@
       for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
       @keyup.enter="$el.click()"
       class="bg-slate-100 text-black"
-      >
+    >
       {{ value -}}
       <span class="visually-hidden sr-only">{{ 'products.product.variant_sold_out_or_unavailable' | t }}</span>
     </label>
@@ -96,7 +93,7 @@
         selected="selected"
       {% endif %}
     >
-      {% if option_unavailable -%}
+      {% if option_out_of_stock -%}
         {% if option_not_exist %}
           {{- 'products.product.value_unavailable' | t: option_value: value -}}
         {% else %}
