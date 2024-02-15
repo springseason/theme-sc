@@ -62,38 +62,6 @@
               assign option_out_of_stock = false
             endif
           endif
-        when 2
-          if option1_name == product.selected_or_first_available_variant.option1 and variants_option2_arr[forloop.index0] == value
-            assign option_not_exist = false
-
-            unless available_option_variants == blank
-              for available_variant_by_rule in available_option_variants
-                if available_variant_by_rule.options contains value
-                  assign option_unavailable = false
-                  break
-                endif
-              endfor
-            endunless
-            if variants_stock_available_arr[forloop.index0]
-              assign option_out_of_stock = false
-            endif
-          endif
-        when 3
-          if option1_name == product.selected_or_first_available_variant.option1 and variants_option2_arr[forloop.index0] == product.selected_or_first_available_variant.option2 and variants_option3_arr[forloop.index0] == value
-            assign option_not_exist = false
-
-            unless available_option_variants == blank
-              for available_variant_by_rule in available_option_variants
-                if available_variant_by_rule.options contains value
-                  assign option_unavailable = false
-                  break
-                endif
-              endfor
-            endunless
-            if variants_stock_available_arr[forloop.index0]
-              assign option_out_of_stock = false
-            endif
-          endif
       endcase
     endfor
   -%}
@@ -137,3 +105,38 @@
     {% comment %} <span class="visually-hidden sr-only">{{ 'products.product.variant_sold_out_or_unavailable' | t }}</span> {% endcomment %}
   </label>
 {%- endfor -%}
+
+{% comment %}
+  when 2
+          if option1_name == product.selected_or_first_available_variant.option1 and variants_option2_arr[forloop.index0] == value
+            assign option_not_exist = false
+
+            unless available_option_variants == blank
+              for available_variant_by_rule in available_option_variants
+                if available_variant_by_rule.options contains value
+                  assign option_unavailable = false
+                  break
+                endif
+              endfor
+            endunless
+            if variants_stock_available_arr[forloop.index0]
+              assign option_out_of_stock = false
+            endif
+          endif
+        when 3
+          if option1_name == product.selected_or_first_available_variant.option1 and variants_option2_arr[forloop.index0] == product.selected_or_first_available_variant.option2 and variants_option3_arr[forloop.index0] == value
+            assign option_not_exist = false
+
+            unless available_option_variants == blank
+              for available_variant_by_rule in available_option_variants
+                if available_variant_by_rule.options contains value
+                  assign option_unavailable = false
+                  break
+                endif
+              endfor
+            endunless
+            if variants_stock_available_arr[forloop.index0]
+              assign option_out_of_stock = false
+            endif
+          endif
+{% endcomment %}

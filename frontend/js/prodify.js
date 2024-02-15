@@ -21,6 +21,7 @@ class Prodify {
       quantityIncrement: '[data-prodify-quantity-increment]',
       quantityDecrement: '[data-prodify-quantity-decrement]',
       quantityPresentation: '[data-prodify-quantity-presentation]',
+      crossProductRulesetJson: '[data-prodify-cross-product-ruleset]',
       crossProductId: 'data-prodify-cross-product-id', // ! no brackets
       crossProductInput: 'data-prodify-cross-product-radio' // ! no brackets
     }
@@ -211,6 +212,19 @@ class Prodify {
 
     return JSON.parse(crossProductDataEl.textContent)
   }
+  getRulesetData = (id) => {
+    if (typeof id !== 'string') return console.error('Cross product ID is missing - for ruleset')
+
+    const selectorString = `${this.selectors.crossProductRulesetJson}[${this.selectors.crossProductId}="${id}"]`
+    const rulesetEls = this.el.querySelectorAll(selectorString)
+
+    if (!Array.from(rulesetEls).length) {
+      return console.error(`Cross product: ${id} ruleset is missing.`)
+    }
+    const rulesets = Array.from(rulesetEls).map((rulesetEl) => JSON.parse(rulesetEl.textContent))
+
+    return rulesets
+  }
   updateTotalPrice = () => {
     const totalPriceEl = this.el.querySelector('#total-price')
     if (!totalPriceEl || !totalPriceEl.textContent) {
@@ -295,6 +309,11 @@ class Prodify {
       event.target.hasAttribute(this.selectors.crossProductId) &&
       event.target.hasAttribute(this.selectors.crossProductInput)
     ) {
+      const cpId = event.target.getAttribute(this.selectors.crossProductId)
+      const rulesets = this.getRulesetData(cpId)
+
+      console.log(rulesets)
+
       this.updateCrossProductVariantIdInput(event)
       this.updateTotalPrice()
       return

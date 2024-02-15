@@ -20,8 +20,42 @@
         data-prodify-cross-product-json
         data-prodify-cross-product-id="{{ cross_product.id }}"
       >
-        {{ cross_product | json }}
+        {{- cross_product | json -}}
       </script>
+
+      {% for ruleset in product.metafields.custom.availability_rules.value %}
+        {% if cross_product.tags contains ruleset.tag %}
+          {% assign cp_ruleset = ruleset %}
+        {% endif %}
+      {% endfor %}
+
+      {% unless cp_ruleset == null %}
+        {% assign ruleset_json = '[' %}
+        {% for rule in cp_ruleset.items.value %}
+          {% assign main_variant_ids = rule.main_variants.value | map: 'id' | join: ',' %}
+          {% assign mv_ids = '[' | append: main_variant_ids | append: ']' %}
+          {% assign av_cp_options = rule.option_variants.value
+            | map: 'options'
+            | join: '","'
+            | prepend: '["'
+            | append: '"]'
+          %}
+          {% assign rule_json = '[' | append: mv_ids | append: ',' | append: av_cp_options | append: ']' %}
+          {% assign ruleset_json = ruleset_json | append: rule_json %}
+          {% unless forloop.last %}
+            {% assign ruleset_json = ruleset_json | append: ',' %}
+          {% endunless %}
+        {% endfor %}
+        {% assign ruleset_json = ruleset_json | append: ']' %}
+
+        <script
+          type="application/json"
+          data-prodify-cross-product-ruleset
+          data-prodify-cross-product-id="{{ cross_product.id }}"
+        >
+          {{- ruleset_json -}}
+        </script>
+      {% endunless %}
 
       {% for cross_option in cross_product.options_with_values %}
         <fieldset>
