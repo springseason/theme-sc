@@ -35,6 +35,7 @@
   assign variants_option1_arr = cross_product.variants | map: 'option1'
   assign variants_option2_arr = cross_product.variants | map: 'option2'
   assign variants_option3_arr = cross_product.variants | map: 'option3'
+  assign variants_media_arr = cross_product.variants | map: 'featured_image'
 -%}
 
 {%- for value in option.values -%}
@@ -120,8 +121,18 @@
   <label
     for="{{ section.id }}__cross-option--{{ cross_product.id }}-{{ option.position | minus: 1 }}-{{ forloop.index0 }}"
     @keyup.enter="$el.click()"
-    class="bg-slate-100 text-black"
+    class="bg-slate-100 text-black !inline-flex items-center gap-2"
   >
+    {% if variants_media_arr[forloop.index0] %}
+      <img
+        class="h-4 w-auto svg-active"
+        src="{{ variants_media_arr[forloop.index0] | image_url }}"
+        alt="{{ option.values[forloop.index0] | escape }} option image"
+        width="16"
+        height="16"
+        loading="eager"
+      >
+    {% endif %}
     {{ value -}}
     {% comment %} <span class="visually-hidden sr-only">{{ 'products.product.variant_sold_out_or_unavailable' | t }}</span> {% endcomment %}
   </label>
