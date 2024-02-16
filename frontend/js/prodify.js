@@ -15,13 +15,13 @@ class Prodify {
       priceContainer: '[data-prodify-price-container]',
       mediaContainer: '[data-prodify-media-container]',
       variantsJson: '[data-prodify-variants-json]',
-      crossProductVariantsJson: '[data-prodify-cross-product-json]',
+      crossProductJson: '[data-prodify-cross-product]',
       optionContainer: '[data-prodify-option-container]',
       productForm: '[data-prodify-product-form]',
       quantityIncrement: '[data-prodify-quantity-increment]',
       quantityDecrement: '[data-prodify-quantity-decrement]',
       quantityPresentation: '[data-prodify-quantity-presentation]',
-      crossProductRulesetJson: '[data-prodify-cross-product-ruleset]',
+      crossProductRulesetJson: '[data-prodify-cross-product-availability]',
       crossProductId: 'data-prodify-cross-product-id', // ! no brackets
       crossProductInput: 'data-prodify-cross-product-radio' // ! no brackets
     }
@@ -203,7 +203,7 @@ class Prodify {
   getCrossProductData = (id) => {
     if (typeof id !== 'string') return console.error('Cross product ID is missing')
 
-    const selectorString = `${this.selectors.crossProductVariantsJson}[${this.selectors.crossProductId}="${id}"]`
+    const selectorString = `${this.selectors.crossProductJson}[${this.selectors.crossProductId}="${id}"]`
     const crossProductDataEl = this.el.querySelector(selectorString)
 
     if (!crossProductDataEl || !crossProductDataEl?.textContent?.length) {
@@ -213,15 +213,24 @@ class Prodify {
     return JSON.parse(crossProductDataEl.textContent)
   }
   getRulesetData = (id) => {
-    if (typeof id !== 'string') return console.error('Cross product ID is missing - for ruleset')
+    const selectorString = `${this.selectors.crossProductRulesetJson}`
+    if (typeof id !== 'string') {
+      console.info('Getting ruleset without cross product id.')
+    } else {
+      selectorString.concat(`[${this.selectors.crossProductId}="${id}"]`)
+    }
 
-    const selectorString = `${this.selectors.crossProductRulesetJson}[${this.selectors.crossProductId}="${id}"]`
     const rulesetEls = this.el.querySelectorAll(selectorString)
 
     if (!Array.from(rulesetEls).length) {
       return console.error(`Cross product: ${id} ruleset is missing.`)
     }
-    const rulesets = Array.from(rulesetEls).map((rulesetEl) => JSON.parse(rulesetEl.textContent))
+    const rulesets = Array.from(rulesetEls).map((rulesetEl) => {
+      const rulesetTitle = rulesetEl.getAttribute(this.selectors.crossProductRulesetJson)
+      return {
+        [rulesetTitle]: JSON.parse(rulesetEl.textContent)
+      }
+    })
 
     return rulesets
   }
@@ -305,15 +314,15 @@ class Prodify {
     }
   }
   onOptionChange = (event) => {
+    const rulesets = this.getRulesetData()
+
+    console.log('ruleset', rulesets)
+
     if (
       event.target.hasAttribute(this.selectors.crossProductId) &&
       event.target.hasAttribute(this.selectors.crossProductInput)
     ) {
       const cpId = event.target.getAttribute(this.selectors.crossProductId)
-      const rulesets = this.getRulesetData(cpId)
-
-      console.log(rulesets)
-
       this.updateCrossProductVariantIdInput(event)
       this.updateTotalPrice()
       return

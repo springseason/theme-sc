@@ -10,37 +10,43 @@
   %}
 {% endcomment %}
 
-{% assign target_metafield_key = 'custom_option.cross_sell_products' %}
-
-{%- unless cross_products == blank -%}
+{%- unless cross_products.empty? -%}
   {% for cross_product in cross_products %}
-    <div class="cross-product-options w-full border-b my-2">
+    <div class="w-full border-b my-2">
       <script
         type="application/json"
-        data-prodify-cross-product-json
         data-prodify-cross-product-id="{{ cross_product.id }}"
+        data-prodify-cross-product
       >
         {{- cross_product | json -}}
       </script>
 
       {% for ruleset in product.metafields.custom.availability_rules.value %}
         {% if cross_product.tags contains ruleset.tag %}
-          {% assign cp_ruleset = ruleset %}
+          {% assign cross_product_ruleset = ruleset %}
+          {% break %}
+        {% else %}
+          {% assign cross_product_ruleset = null %}
         {% endif %}
       {% endfor %}
 
-      {% unless cp_ruleset == null %}
+      {% unless cross_product_ruleset == null %}
         {% assign ruleset_json = '[' %}
-        {% for rule in cp_ruleset.items.value %}
+        {% for rule in cross_product_ruleset.items.value %}
           {% assign main_variant_ids = rule.main_variants.value | map: 'id' | join: ',' %}
-          {% assign mv_ids = '[' | append: main_variant_ids | append: ']' %}
-          {% assign av_cp_options = rule.option_variants.value
+          {% assign main_variant_ids_string = '[' | append: main_variant_ids | append: ']' %}
+          {% assign available_cross_product_options_string = rule.option_variants.value
             | map: 'options'
             | join: '","'
             | prepend: '["'
             | append: '"]'
           %}
-          {% assign rule_json = '[' | append: mv_ids | append: ',' | append: av_cp_options | append: ']' %}
+          {% assign rule_json = '['
+            | append: main_variant_ids_string
+            | append: ','
+            | append: available_cross_product_options_string
+            | append: ']'
+          %}
           {% assign ruleset_json = ruleset_json | append: rule_json %}
           {% unless forloop.last %}
             {% assign ruleset_json = ruleset_json | append: ',' %}
@@ -50,8 +56,8 @@
 
         <script
           type="application/json"
-          data-prodify-cross-product-ruleset
           data-prodify-cross-product-id="{{ cross_product.id }}"
+          data-prodify-cross-product-availability="{{ cross_product.title }}"
         >
           {{- ruleset_json -}}
         </script>
@@ -68,20 +74,10 @@
             cross_product: cross_product,
             option: cross_option,
             picker_type: 'radio',
+            ruleset: cross_product_ruleset
           %}
         </fieldset>
       {% endfor %}
     </div>
   {% endfor %}
-{% else %}
-  <div>
-    Please add a cross-sell product to the product's metafield:
-    <a
-      class="text-blue-500 underline hover:text-blue-800"
-      href="{{ '/admin/products/' | append: product.id }}"
-      target="_blank"
-    >
-      {{- target_metafield_key -}}
-    </a>
-  </div>
 {%- endunless %}

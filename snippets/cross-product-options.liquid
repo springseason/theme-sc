@@ -17,17 +17,13 @@
 
 {% assign selected_variant_id = product.selected_or_first_available_variant.id %}
 
-{% for ruleset in product.metafields.custom.availability_rules.value %}
-  {% if cross_product.tags contains ruleset.tag %}
-    {% for rule in ruleset.items.value %}
-      {% for variant in rule.main_variants.value %}
-        {% if variant.id == selected_variant_id %}
-          {% assign available_option_variants = rule.option_variants.value %}
-          {% break %}
-        {% endif %}
-      {% endfor %}
-    {% endfor %}
-  {% endif %}
+{% for rule in ruleset.items.value %}
+  {% for variant in rule.main_variants.value %}
+    {% if variant.id == selected_variant_id %}
+      {% assign available_variants = rule.option_variants.value %}
+      {% break %}
+    {% endif %}
+  {% endfor %}
 {% endfor %}
 
 {%- liquid
@@ -44,33 +40,71 @@
     assign option_out_of_stock = true
     assign option_unavailable = true
 
+    if ruleset == null
+      assign option_unavailable = false
+    endif
+
     for option1_name in variants_option1_arr
       case option.position
         when 1
           if variants_option1_arr[forloop.index0] == value
             assign option_not_exist = false
 
-            unless available_option_variants == blank
-              for available_variant_by_rule in available_option_variants
-                if available_variant_by_rule.options contains value
-                  assign option_unavailable = false
-                  break
-                endif
-              endfor
-            endunless
             if variants_stock_available_arr[forloop.index0]
               assign option_out_of_stock = false
             endif
           endif
+
+          unless available_variants.empty?
+            for available_variant in available_variants
+              if available_variant.options contains value
+                assign option_unavailable = false
+                break
+              endif
+            endfor
+          endunless
+        when 2
+          if option1_name == cross_product.selected_or_first_available_variant.option1 and variants_option2_arr[forloop.index0] == value
+            assign option_not_exist = false
+
+            if variants_stock_available_arr[forloop.index0]
+              assign option_out_of_stock = false
+            endif
+          endif
+
+          unless available_variants.empty?
+            for available_variant in available_variants
+              if available_variant.options contains value
+                assign option_unavailable = false
+                break
+              endif
+            endfor
+          endunless
+        when 3
+          if option1_name == cross_product.selected_or_first_available_variant.option1 and variants_option2_arr[forloop.index0] == cross_product.selected_or_first_available_variant.option2 and variants_option3_arr[forloop.index0] == value
+            assign option_not_exist = false
+
+            if variants_stock_available_arr[forloop.index0]
+              assign option_out_of_stock = false
+            endif
+          endif
+
+          unless available_variants.empty?
+            for available_variant in available_variants
+              if available_variant.options contains value
+                assign option_unavailable = false
+                break
+              endif
+            endfor
+          endunless
       endcase
     endfor
   -%}
 
   <input
     type="radio"
-    {% comment %} 💡 ?: id - option idx - value idx {% endcomment %}
     id="{{ section.id }}__cross-option--{{ cross_product.id }}-{{ option.position | minus: 1 }}-{{ forloop.index0 }}"
-    name="cp-{{cross_product.id}}-{{ option.name }}"
+    name="cp-{{ cross_product.id}}-{{ option.name }}"
     value="{{ value | escape }}"
     data-prodify-cross-product-radio
     data-prodify-cross-product-id="{{ cross_product.id }}"
@@ -105,38 +139,3 @@
     {% comment %} <span class="visually-hidden sr-only">{{ 'products.product.variant_sold_out_or_unavailable' | t }}</span> {% endcomment %}
   </label>
 {%- endfor -%}
-
-{% comment %}
-  when 2
-          if option1_name == product.selected_or_first_available_variant.option1 and variants_option2_arr[forloop.index0] == value
-            assign option_not_exist = false
-
-            unless available_option_variants == blank
-              for available_variant_by_rule in available_option_variants
-                if available_variant_by_rule.options contains value
-                  assign option_unavailable = false
-                  break
-                endif
-              endfor
-            endunless
-            if variants_stock_available_arr[forloop.index0]
-              assign option_out_of_stock = false
-            endif
-          endif
-        when 3
-          if option1_name == product.selected_or_first_available_variant.option1 and variants_option2_arr[forloop.index0] == product.selected_or_first_available_variant.option2 and variants_option3_arr[forloop.index0] == value
-            assign option_not_exist = false
-
-            unless available_option_variants == blank
-              for available_variant_by_rule in available_option_variants
-                if available_variant_by_rule.options contains value
-                  assign option_unavailable = false
-                  break
-                endif
-              endfor
-            endunless
-            if variants_stock_available_arr[forloop.index0]
-              assign option_out_of_stock = false
-            endif
-          endif
-{% endcomment %}
