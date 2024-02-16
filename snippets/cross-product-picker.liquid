@@ -68,9 +68,11 @@
           <legend>
             {{ cross_product.title }} -
             {{ cross_option.name }}
+            {% unless cross_product_ruleset == null %}
+              <span class="text-red-800 opacity-70 text-lg">⊙</span>
+            {% endunless %}
           </legend>
-          {%
-            render 'cross-product-options',
+          {% render 'cross-product-options',
             cross_product: cross_product,
             option: cross_option,
             picker_type: 'radio',

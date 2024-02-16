@@ -167,6 +167,7 @@ class Prodify {
             return
           }
           input.classList.add('disabled')
+          input.disabled = true
         }
       }
     })
@@ -225,12 +226,7 @@ class Prodify {
     if (!Array.from(rulesetEls).length) {
       return console.error(`Cross product: ${id} ruleset is missing.`)
     }
-    const rulesets = Array.from(rulesetEls).map((rulesetEl) => {
-      const rulesetTitle = rulesetEl.getAttribute(this.selectors.crossProductRulesetJson)
-      return {
-        [rulesetTitle]: JSON.parse(rulesetEl.textContent)
-      }
-    })
+    const rulesets = Array.from(rulesetEls).map((rulesetEl) => JSON.parse(rulesetEl.textContent))
 
     return rulesets
   }
@@ -314,15 +310,10 @@ class Prodify {
     }
   }
   onOptionChange = (event) => {
-    const rulesets = this.getRulesetData()
-
-    console.log('ruleset', rulesets)
-
     if (
       event.target.hasAttribute(this.selectors.crossProductId) &&
       event.target.hasAttribute(this.selectors.crossProductInput)
     ) {
-      const cpId = event.target.getAttribute(this.selectors.crossProductId)
       this.updateCrossProductVariantIdInput(event)
       this.updateTotalPrice()
       return
@@ -330,6 +321,64 @@ class Prodify {
 
     this.updateCurrentOptions()
     this.updateCurrentVariant()
+
+    const crossInputEls = this.el.querySelectorAll(`[${this.selectors.crossProductInput}]`)
+    const crossProductIds = Array.from(crossInputEls).map((el) => el.getAttribute(`${this.selectors.crossProductId}`))
+    const uniqueCrossProductIds = [...new Set(crossProductIds)]
+
+    const availableCrossLabels = uniqueCrossProductIds.map((crossProductId) => {
+      const sel = `${this.selectors.crossProductRulesetJson}[${this.selectors.crossProductId}="${crossProductId}"]`
+      const rulesetEl = this.el.querySelector(sel)
+
+      const response = { [crossProductId]: null }
+
+      if (!rulesetEl) {
+        return response
+      }
+      const ruleset = JSON.parse(rulesetEl.textContent)
+      if (!ruleset.length) {
+        return response
+      }
+
+      const availableOptions = []
+      for (let rule of ruleset) {
+        const main_variant_ids = rule[0]
+        if (!main_variant_ids.includes(this.currentVariant.id)) {
+          continue
+        }
+
+        availableOptions.push(...rule[1])
+        break
+      }
+
+      response[crossProductId] = availableOptions
+
+      // 💡 when no ruleset found it will return NULL
+      return response
+    })
+
+    for (let cp of availableCrossLabels) {
+      const sell = `[${this.selectors.crossProductInput}][${this.selectors.crossProductId}="${Object.keys(cp)[0]}"]`
+
+      Array.from(this.el.querySelectorAll(sell)).forEach((inputEl) => {
+        const labels = Object.values(cp)[0]
+
+        if (labels) {
+          const isAvailable = labels.includes(inputEl.value)
+          if (isAvailable) {
+            inputEl.disabled = false
+            inputEl.classList.remove('disabled')
+          } else {
+            inputEl.disabled = true
+            inputEl.classList.add('disabled')
+          }
+        } else {
+          inputEl.disabled = false
+          inputEl.classList.remove('disabled')
+        }
+      })
+    }
+
     this.updateAddButtonDom(true, '', false)
     this.compareInputValues()
     this.setOptionSelected(event.target)
