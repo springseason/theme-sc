@@ -10,6 +10,7 @@ class Prodify {
     this.el = document.querySelector('[data-prodify]')
     this.pickerType = this.el.dataset.prodify
     this.currentVariant = null
+    this.variantData = null
 
     this.selectors = {
       priceContainer: '[data-prodify-price-container]',
@@ -23,7 +24,8 @@ class Prodify {
       quantityPresentation: '[data-prodify-quantity-presentation]',
       crossProductRulesetJson: '[data-prodify-cross-product-availability]',
       crossProductId: 'data-prodify-cross-product-id', // ! no brackets
-      crossProductInput: 'data-prodify-cross-product-radio' // ! no brackets
+      crossProductInput: 'data-prodify-cross-product-radio', // ! no brackets
+      crossProductOptionPosition: 'data-prodify-cross-product-radio-position' // ! no brackets
     }
 
     this.textStrings = {
@@ -275,12 +277,11 @@ class Prodify {
 
     totalPriceEl.textContent = this.helpers.formatCurrency(regularPrice.currency)(regularPrice.amount + totalCrossPrice)
   }
-  getCurrentCrossProductVariant(event) {
-    const crossProductId = event.target.getAttribute(this.selectors.crossProductId)
+  getCurrentCrossProductVariant(crossProductId) {
     const crossProduct = this.getCrossProductData(crossProductId)
 
     const currentCrossProductOptionEls = Array.from(
-      this.el.querySelectorAll(`input[data-prodify-cross-product-id="${crossProductId}"]:checked`)
+      this.el.querySelectorAll(`input[${this.selectors.crossProductId}="${crossProductId}"]:checked`)
     )
     const currentCrossProductOptionLabels = currentCrossProductOptionEls?.map((el) => el.value)
 
@@ -291,95 +292,67 @@ class Prodify {
     return currentCrossProductVariant
   }
 
-  updateCrossProductVariantIdInput(event) {
-    const crossProductId = event.target.getAttribute(this.selectors.crossProductId)
-    const currentVariant = this.getCurrentCrossProductVariant(event)
-
-    if (!currentVariant || !currentVariant.id) {
-      console.error('Current variant id not found')
-      return
-    }
-
+  updateCrossProductVariantIdInput(crossProductId, currentCrossVariantId) {
     const productForm = document.querySelector(this.selectors.productForm)
     if (!productForm) return
 
     const formInput = productForm.querySelector(`input[id="cp-${crossProductId}"]`)
 
     if (formInput) {
-      formInput.value = currentVariant.id
+      formInput.value = currentCrossVariantId
     }
   }
+
+  compareCrossInputValues(crossProductId, currentOptionPosition) {
+    const crossProduct = this.getCrossProductData(crossProductId)
+    if (!crossProduct) {
+      console.error('CP not found')
+      return
+    }
+
+    const checkedValue = this.el.querySelector(
+      `input[${this.selectors.crossProductId}="${crossProductId}"]:checked`
+    ).value
+
+    const variantsMatchingOptionOneSelected = crossProduct.variants.filter(
+      (variant) => variant.option1 === checkedValue
+    )
+
+    const filteredInputs = Array.from(
+      this.el.querySelectorAll(`input[${this.selectors.crossProductId}="${crossProductId}"]`)
+    ).filter(
+      (inputEl) =>
+        inputEl.dataset.prodifyCrossProductRadioPosition !== currentOptionPosition &&
+        parseInt(inputEl.dataset.prodifyCrossProductRadioPosition) !== 0
+    )
+
+    filteredInputs.forEach((input) => {
+      const optionValue = input.value
+      const posi = parseInt(input.dataset.prodifyCrossProductRadioPosition)
+      const foundVariant = variantsMatchingOptionOneSelected.some((vari) => vari[`option${posi + 1}`] === optionValue)
+
+      input.disabled = !foundVariant
+      input.classList.toggle('disabled', !foundVariant)
+    })
+  }
+
   onOptionChange = (event) => {
     if (
       event.target.hasAttribute(this.selectors.crossProductId) &&
       event.target.hasAttribute(this.selectors.crossProductInput)
     ) {
-      this.updateCrossProductVariantIdInput(event)
+      const optionPosition = event.target.getAttribute(this.selectors.crossProductOptionPosition)
+      const crossProductId = event.target.getAttribute(this.selectors.crossProductId)
+
+      this.compareCrossInputValues(crossProductId, optionPosition)
+      this.updateCrossProductVariantId(crossProductId)
       this.updateTotalPrice()
       return
     }
 
     this.updateCurrentOptions()
     this.updateCurrentVariant()
-
-    const crossInputEls = this.el.querySelectorAll(`[${this.selectors.crossProductInput}]`)
-    const crossProductIds = Array.from(crossInputEls).map((el) => el.getAttribute(`${this.selectors.crossProductId}`))
-    const uniqueCrossProductIds = [...new Set(crossProductIds)]
-
-    const availableCrossLabels = uniqueCrossProductIds.map((crossProductId) => {
-      const sel = `${this.selectors.crossProductRulesetJson}[${this.selectors.crossProductId}="${crossProductId}"]`
-      const rulesetEl = this.el.querySelector(sel)
-
-      const response = { [crossProductId]: null }
-
-      if (!rulesetEl) {
-        return response
-      }
-      const ruleset = JSON.parse(rulesetEl.textContent)
-      if (!ruleset.length) {
-        return response
-      }
-
-      const availableOptions = []
-      for (let rule of ruleset) {
-        const main_variant_ids = rule[0]
-        if (!main_variant_ids.includes(this.currentVariant.id)) {
-          continue
-        }
-
-        availableOptions.push(...rule[1])
-        break
-      }
-
-      response[crossProductId] = availableOptions
-
-      // 💡 when no ruleset found it will return NULL
-      return response
-    })
-
-    for (let cp of availableCrossLabels) {
-      const sell = `[${this.selectors.crossProductInput}][${this.selectors.crossProductId}="${Object.keys(cp)[0]}"]`
-
-      Array.from(this.el.querySelectorAll(sell)).forEach((inputEl) => {
-        const labels = Object.values(cp)[0]
-
-        if (labels) {
-          const isAvailable = labels.includes(inputEl.value)
-          if (isAvailable) {
-            inputEl.disabled = false
-            inputEl.classList.remove('disabled')
-          } else {
-            inputEl.disabled = true
-            inputEl.classList.add('disabled')
-          }
-        } else {
-          inputEl.disabled = false
-          inputEl.classList.remove('disabled')
-        }
-      })
-    }
-
-    this.updateAddButtonDom(true, '', false)
+    this.updateAddButtonDom(true, '')
     this.compareInputValues()
     this.setOptionSelected(event.target)
     if (!this.currentVariant) {

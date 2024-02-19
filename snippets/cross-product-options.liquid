@@ -107,11 +107,13 @@
     name="cp-{{ cross_product.id}}-{{ option.name }}"
     value="{{ value | escape }}"
     data-prodify-cross-product-radio
+    data-prodify-cross-product-radio-position="{{ option.position | minus: 1 }}"
     data-prodify-cross-product-id="{{ cross_product.id }}"
     {% if option.selected_value == value %}
       checked
     {% endif %}
     {% if option_not_exist or option_unavailable %}
+      disabled
       class="disabled hidden [&:checked+label]:bg-indigo-900 [&:checked+label]:text-white"
     {% elsif option_out_of_stock %}
       class="out-of-stock hidden [&:checked+label]:bg-indigo-900 [&:checked+label]:text-white"
