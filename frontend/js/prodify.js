@@ -277,7 +277,8 @@ class Prodify {
 
     totalPriceEl.textContent = this.helpers.formatCurrency(regularPrice.currency)(regularPrice.amount + totalCrossPrice)
   }
-  getCurrentCrossProductVariant(crossProductId) {
+  getCurrentCrossProductVariant(event) {
+    const crossProductId = event.target.getAttribute(this.selectors.crossProductId)
     const crossProduct = this.getCrossProductData(crossProductId)
 
     const currentCrossProductOptionEls = Array.from(
@@ -292,7 +293,14 @@ class Prodify {
     return currentCrossProductVariant
   }
 
-  updateCrossProductVariantIdInput(crossProductId, currentCrossVariantId) {
+  updateCrossProductVariantIdInput(event) {
+    const crossProductId = event.target.getAttribute(this.selectors.crossProductId)
+    const currentVariant = this.getCurrentCrossProductVariant(event)
+
+    if (!currentVariant || !currentVariant.id) {
+      console.error('Current variant id not found')
+      return
+    }
     const productForm = document.querySelector(this.selectors.productForm)
     if (!productForm) return
 
@@ -345,14 +353,72 @@ class Prodify {
       const crossProductId = event.target.getAttribute(this.selectors.crossProductId)
 
       this.compareCrossInputValues(crossProductId, optionPosition)
-      this.updateCrossProductVariantIdInput(crossProductId)
+      this.updateCrossProductVariantIdInput(event)
       this.updateTotalPrice()
       return
     }
 
     this.updateCurrentOptions()
     this.updateCurrentVariant()
-    this.updateAddButtonDom(true, '')
+
+    const crossInputEls = this.el.querySelectorAll(`[${this.selectors.crossProductInput}]`)
+    const crossProductIds = Array.from(crossInputEls).map((el) => el.getAttribute(`${this.selectors.crossProductId}`))
+    const uniqueCrossProductIds = [...new Set(crossProductIds)]
+
+    const availableCrossLabels = uniqueCrossProductIds.map((crossProductId) => {
+      const sel = `${this.selectors.crossProductRulesetJson}[${this.selectors.crossProductId}="${crossProductId}"]`
+      const rulesetEl = this.el.querySelector(sel)
+
+      const response = { [crossProductId]: null }
+
+      if (!rulesetEl) {
+        return response
+      }
+      const ruleset = JSON.parse(rulesetEl.textContent)
+      if (!ruleset.length) {
+        return response
+      }
+
+      const availableOptions = []
+      for (let rule of ruleset) {
+        const main_variant_ids = rule[0]
+        if (!main_variant_ids.includes(this.currentVariant.id)) {
+          continue
+        }
+
+        availableOptions.push(...rule[1])
+        break
+      }
+
+      response[crossProductId] = availableOptions
+
+      // 💡 when no ruleset found it will return NULL
+      return response
+    })
+
+    for (let cp of availableCrossLabels) {
+      const sell = `[${this.selectors.crossProductInput}][${this.selectors.crossProductId}="${Object.keys(cp)[0]}"]`
+
+      Array.from(this.el.querySelectorAll(sell)).forEach((inputEl) => {
+        const labels = Object.values(cp)[0]
+
+        if (labels) {
+          const isAvailable = labels.includes(inputEl.value)
+          if (isAvailable) {
+            inputEl.disabled = false
+            inputEl.classList.remove('disabled')
+          } else {
+            inputEl.disabled = true
+            inputEl.classList.add('disabled')
+          }
+        } else {
+          inputEl.disabled = false
+          inputEl.classList.remove('disabled')
+        }
+      })
+    }
+
+    this.updateAddButtonDom(true, '', false)
     this.compareInputValues()
     this.setOptionSelected(event.target)
     if (!this.currentVariant) {
