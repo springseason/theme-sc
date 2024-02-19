@@ -345,7 +345,7 @@ class Prodify {
       const crossProductId = event.target.getAttribute(this.selectors.crossProductId)
 
       this.compareCrossInputValues(crossProductId, optionPosition)
-      this.updateCrossProductVariantId(crossProductId)
+      this.updateCrossProductVariantIdInput(crossProductId)
       this.updateTotalPrice()
       return
     }
