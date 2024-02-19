@@ -96,10 +96,7 @@
         product_form_id: 'product-form-id',
         picker_type: section.settings.picker_type
       %}
-      {%
-        render 'cross-product-picker',
-        cross_products: cross_products,
-      %}
+      {% render 'cross-product-picker', cross_products: cross_products %}
 
       <div class="quantity-row">
         <label for="quantity-control-input">Quantity</label>
@@ -155,6 +152,7 @@
             >
             <input
               type="hidden"
+              id="cp-{{ cross_product.id }}-relation"
               name="items[{{ cross_index }}]properties[main_product_id]"
               value="{{ product.selected_or_first_available_variant.id }}"
             >
@@ -304,7 +302,7 @@
   .section-main-product .shopify-section-main-product-inner .flex .info fieldset input[disabled] + label {
     background-color: transparent;
     color: lightgray;
-    cursor: default
+    cursor: default;
   }
 
   .section-main-product .shopify-section-main-product-inner .flex .info .quantity-row label {

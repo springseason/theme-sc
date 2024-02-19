@@ -78,7 +78,12 @@ class Prodify {
     const productForms = document.querySelectorAll(this.selectors.productForm)
     productForms.forEach((productForm) => {
       const input = productForm.querySelector('input[name="id"]')
+      const prevValue = input.value
       input.value = this.currentVariant.id
+
+      // update related cross products
+      const relatedEls = productForm.querySelectorAll(`input[id^="cp-"][value="${prevValue}"]`)
+      relatedEls.forEach((el) => (el.value = this.currentVariant.id))
     })
   }
   updateURL() {
@@ -305,9 +310,8 @@ class Prodify {
     if (!productForm) return
 
     const formInput = productForm.querySelector(`input[id="cp-${crossProductId}"]`)
-
     if (formInput) {
-      formInput.value = currentCrossVariantId
+      formInput.value = currentVariant.id
     }
   }
 
@@ -405,6 +409,10 @@ class Prodify {
         if (labels) {
           const isAvailable = labels.includes(inputEl.value)
           if (isAvailable) {
+            if (labels.length === 1) {
+              inputEl.checked = true
+            }
+
             inputEl.disabled = false
             inputEl.classList.remove('disabled')
           } else {
