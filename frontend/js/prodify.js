@@ -8,8 +8,13 @@ class Prodify {
 
   initializeElements() {
     this.el = document.querySelector('[data-prodify]')
+    if (!this.el) {
+      console.error('Prodify element not found.')
+      return
+    }
     this.pickerType = this.el.dataset.prodify
     this.currentVariant = null
+    this.currentCrossProducts = {}
     this.variantData = null
 
     this.selectors = {
@@ -18,14 +23,15 @@ class Prodify {
       variantsJson: '[data-prodify-variants-json]',
       crossProductJson: '[data-prodify-cross-product]',
       optionContainer: '[data-prodify-option-container]',
+      crossOptionContainer: '[data-prodify-cross-option-container]',
       productForm: '[data-prodify-product-form]',
       quantityIncrement: '[data-prodify-quantity-increment]',
       quantityDecrement: '[data-prodify-quantity-decrement]',
       quantityPresentation: '[data-prodify-quantity-presentation]',
       crossProductRulesetJson: '[data-prodify-cross-product-availability]',
-      crossProductId: 'data-prodify-cross-product-id', // ! no brackets
-      crossProductInput: 'data-prodify-cross-product-radio', // ! no brackets
-      crossProductOptionPosition: 'data-prodify-cross-product-radio-position' // ! no brackets
+      crossProductId: 'data-prodify-cross-product-id',
+      crossProductInput: 'data-prodify-cross-product-radio',
+      crossProductOptionPosition: 'data-prodify-cross-product-radio-position'
     }
 
     this.textStrings = {
@@ -40,8 +46,9 @@ class Prodify {
     this.quantityPresentationInput = this.el.querySelector(this.selectors.quantityPresentation)
     this.quantityHiddenInput = this.el.querySelector('input[name="quantity"]')
 
-    this.updateTotalPrice()
+    // this.initCrossProducts(this.el)
   }
+
   bindEventListeners() {
     this.el.addEventListener('change', this.onOptionChange)
     if (this.quantityIncrementButton && this.quantityDecrementButton && this.quantityPresentationInput) {
@@ -49,6 +56,117 @@ class Prodify {
       this.quantityDecrementButton.addEventListener('click', () => this.updateQuantity('down'))
     }
   }
+  initCrossProducts = (el) => {
+    const data = Array.from(el.querySelectorAll(this.selectors.crossProductJson)).map(
+      (crossProductDataEl) => JSON.parse(crossProductDataEl.textContent) || null
+    )
+
+    for (const crossProduct of data) {
+      const currentOptions = this.getActiveCPOptions(crossProduct.id)
+      this.updateCrossProductState(crossProduct, currentOptions)
+
+      // default SET state
+      this.currentCrossProducts = {
+        ...this.currentCrossProducts,
+        [crossProduct.id]: {
+          updateVariant: (_currentOptions, positionIdx) =>
+            this.updateCrossProductState(crossProduct, _currentOptions, positionIdx)
+        }
+      }
+    }
+  }
+  updateCrossProductState = (crossProduct, currentOptions, positionIdx) => {
+    const activeVariant = this.findActiveCPVariant(crossProduct, currentOptions)
+    if (activeVariant) {
+      this.currentCrossProducts[crossProduct.id] = { ...this.currentCrossProducts[crossProduct.id], activeVariant }
+    } else {
+      console.error('cross product variant not found')
+    }
+
+    this.currentCrossProducts[crossProduct.id].availableOptions = this.getAvailableCPOptions(
+      crossProduct,
+      currentOptions,
+      positionIdx
+    )
+  }
+  filterAvailableCrossVariants(crossProduct, currentOptions, positionIdx) {
+    const currentPosition = parseInt(positionIdx) + 1 // add 1 as it's null based ATM
+    if (currentPosition < 1 || currentPosition > 3) {
+      console.error('invalid option position')
+      return
+    }
+    if (!Object.keys(currentOptions).length) {
+      console.error('invalid current options')
+      return
+    }
+
+    if (currentOptions.length === 1) {
+      return crossProduct.variants.filter(
+        (vari) => vari[`option${currentPosition}`] === currentOptions[`option${currentPosition}`]
+      )
+    }
+
+    switch (currentPosition) {
+      case 1:
+        return crossProduct.variants.filter((vari) => vari.option1 === currentOptions.option1)
+      case 2:
+        return crossProduct.variants.filter((vari) => vari.option2 === currentOptions.option2)
+      case 3:
+        return crossProduct.variants.filter((vari) => vari.option3 === currentOptions.option3)
+    }
+  }
+  getUniqueOptionsFromVariants(variants) {
+    return variants.reduce(
+      (acc, vari) =>
+        vari.options.map((option, idx) =>
+          acc[idx] ? (acc[idx].includes(option) ? acc[idx] : [...acc[idx], option]) : [option]
+        ),
+      []
+    )
+  }
+  getAvailableCPOptions = (crossProduct, currentOptions, positionIdx = 0) =>
+    this.getUniqueOptionsFromVariants(this.filterAvailableCrossVariants(crossProduct, currentOptions, positionIdx))
+
+  findActiveCPVariant = (crossProduct, options) =>
+    crossProduct.variants.find((vari) =>
+      this.helpers.arraysAreEqual(
+        vari.options,
+        Object.entries(options).map(([key, value]) => value)
+      )
+    )
+
+  getActiveCPOptions(crossProductId) {
+    const sel = `input[${this.selectors.crossProductInput}][${this.selectors.crossProductId}="${crossProductId}"]:checked`
+    const activeOptions = Array.from(this.el.querySelectorAll(sel)).map((itemEl) => {
+      const posi = parseInt(itemEl.dataset.prodifyCrossProductRadioPosition) + 1
+      return { [`option${posi}`]: itemEl.value }
+    })
+
+    return Object.assign({}, ...activeOptions)
+  }
+  updateCrossProductAvailability(crossProductId, currentPosiIdx) {
+    const inputEls = this.el.querySelectorAll(
+      `input[${this.selectors.crossProductInput}][${this.selectors.crossProductId}="${crossProductId}"]`
+    )
+    const currentPosition = parseInt(currentPosiIdx)
+    if (typeof currentPosition !== 'number') {
+      return
+    }
+
+    Array.from(inputEls).forEach((el) => {
+      const elPosi = parseInt(el.dataset.prodifyCrossProductRadioPosition)
+      if (
+        currentPosition === elPosi ||
+        (elPosi === 0 && currentPosition === elPosi) ||
+        this.currentCrossProducts[crossProductId].availableOptions[elPosi].includes(el.value)
+      ) {
+        el.disabled = false
+      } else {
+        el.disabled = true
+      }
+    })
+  }
+
   updateQuantity(stepDirection) {
     const adjustQuantity = (direction) => (quantity) => Math.max(1, quantity + direction)
     const previousQuantity = parseInt(this.quantityPresentationInput.value)
@@ -220,6 +338,20 @@ class Prodify {
 
     return JSON.parse(crossProductDataEl.textContent)
   }
+  getCrossProductVariant(crossProductId, options) {
+    if (typeof options !== 'object') {
+      console.error('invalid options')
+      return
+    }
+    const cpData = this.getCrossProductData(crossProductId)
+    const optionsData = JSON.parse(JSON.stringify(options))
+
+    const variant = cpData.variants.find((cpVariant) =>
+      window.sourcherry.helpers.arraysAreEqual(cpVariant.options, optionsData)
+    )
+
+    return variant
+  }
   getRulesetData = (id) => {
     const selectorString = `${this.selectors.crossProductRulesetJson}`
     if (typeof id !== 'string') {
@@ -246,7 +378,6 @@ class Prodify {
     if (!regularPriceEl || !regularPriceEl.textContent) {
       return console.error('regular price el not found')
     }
-    const regularPrice = this.helpers.parseMoneyString(regularPriceEl.textContent)
 
     const currentCrossProductOptionEls = Array.from(
       this.el.querySelectorAll(`input[${this.selectors.crossProductInput}]:checked`)
@@ -278,6 +409,7 @@ class Prodify {
       }
     }, {})
 
+    const regularPrice = this.helpers.parseMoneyString(regularPriceEl.textContent)
     const totalCrossPrice = Object.values(priceByProductId).reduce((acc, val) => acc + val, 0)
 
     totalPriceEl.textContent = this.helpers.formatCurrency(regularPrice.currency)(regularPrice.amount + totalCrossPrice)
@@ -349,82 +481,91 @@ class Prodify {
   }
 
   onOptionChange = (event) => {
-    if (
-      event.target.hasAttribute(this.selectors.crossProductId) &&
-      event.target.hasAttribute(this.selectors.crossProductInput)
-    ) {
-      const optionPosition = event.target.getAttribute(this.selectors.crossProductOptionPosition)
-      const crossProductId = event.target.getAttribute(this.selectors.crossProductId)
+    if (event.target.dataset.x) {
+      // if (
+      //   event.target.hasAttribute(this.selectors.crossProductId) &&
+      //   event.target.hasAttribute(this.selectors.crossProductInput) &&
+      //   event.target.hasAttribute(this.selectors.crossProductOptionPosition)
+      // ) {
+      // const crossProductId = event.target.getAttribute(this.selectors.crossProductId)
+      // const optionPosiIdx = event.target.getAttribute(this.selectors.crossProductOptionPosition)
 
-      this.compareCrossInputValues(crossProductId, optionPosition)
-      this.updateCrossProductVariantIdInput(event)
-      this.updateTotalPrice()
+      // const currentOptions = this.getActiveCPOptions(crossProductId)
+      // this.currentCrossProducts[crossProductId].updateVariant(currentOptions, optionPosiIdx)
+
+      // console.log(this.currentCrossProducts[crossProductId].activeVariant)
+      // this.updateCrossProductAvailability(crossProductId, optionPosiIdx)
+
+      // this.updateTotalPrice()
+      // // this.compareCrossInputValues(crossProductId, optionPosition)
+      // // this.updateCrossProductVariantIdInput(event)
+      // // return
       return
     }
 
     this.updateCurrentOptions()
     this.updateCurrentVariant()
 
-    const crossInputEls = this.el.querySelectorAll(`[${this.selectors.crossProductInput}]`)
-    const crossProductIds = Array.from(crossInputEls).map((el) => el.getAttribute(`${this.selectors.crossProductId}`))
-    const uniqueCrossProductIds = [...new Set(crossProductIds)]
+    // const crossInputEls = this.el.querySelectorAll(`[${this.selectors.crossProductInput}]`)
+    // const crossProductIds = Array.from(crossInputEls).map((el) => el.getAttribute(`${this.selectors.crossProductId}`))
+    // const uniqueCrossProductIds = [...new Set(crossProductIds)]
 
-    const availableCrossLabels = uniqueCrossProductIds.map((crossProductId) => {
-      const sel = `${this.selectors.crossProductRulesetJson}[${this.selectors.crossProductId}="${crossProductId}"]`
-      const rulesetEl = this.el.querySelector(sel)
+    // const availableCrossLabels = uniqueCrossProductIds.map((crossProductId) => {
+    //   const sel = `${this.selectors.crossProductRulesetJson}[${this.selectors.crossProductId}="${crossProductId}"]`
+    //   const rulesetEl = this.el.querySelector(sel)
 
-      const response = { [crossProductId]: null }
+    //   const response = { [crossProductId]: null }
 
-      if (!rulesetEl) {
-        return response
-      }
-      const ruleset = JSON.parse(rulesetEl.textContent)
-      if (!ruleset.length) {
-        return response
-      }
+    //   if (!rulesetEl) {
+    //     return response
+    //   }
+    //   const ruleset = JSON.parse(rulesetEl.textContent)
+    //   if (!ruleset.length) {
+    //     return response
+    //   }
 
-      const availableOptions = []
-      for (let rule of ruleset) {
-        const main_variant_ids = rule[0]
-        if (!main_variant_ids.includes(this.currentVariant.id)) {
-          continue
-        }
+    //   const availableOptions = []
+    //   for (let rule of ruleset) {
+    //     const main_variant_ids = rule[0]
+    //     if (!main_variant_ids.includes(this.currentVariant.id)) {
+    //       continue
+    //     }
 
-        availableOptions.push(...rule[1])
-        break
-      }
+    //     availableOptions.push(...rule[1])
+    //     break
+    //   }
 
-      response[crossProductId] = availableOptions
+    //   response[crossProductId] = availableOptions
 
-      // 💡 when no ruleset found it will return NULL
-      return response
-    })
+    //   // 💡 when no ruleset found it will return NULL
+    //   return response
+    // })
 
-    for (let cp of availableCrossLabels) {
-      const sell = `[${this.selectors.crossProductInput}][${this.selectors.crossProductId}="${Object.keys(cp)[0]}"]`
+    // for (let cp of availableCrossLabels) {
+    //   const sell = `[${this.selectors.crossProductInput}][${this.selectors.crossProductId}="${Object.keys(cp)[0]}"]`
 
-      Array.from(this.el.querySelectorAll(sell)).forEach((inputEl) => {
-        const labels = Object.values(cp)[0]
+    //   Array.from(this.el.querySelectorAll(sell)).forEach((inputEl) => {
+    //     const labels = Object.values(cp)[0]
 
-        if (labels) {
-          const isAvailable = labels.includes(inputEl.value)
-          if (isAvailable) {
-            if (labels.length === 1) {
-              inputEl.checked = true
-            }
+    //     if (labels) {
+    //       const isAvailable = labels.includes(inputEl.value)
+    //       if (isAvailable) {
+    //         if (labels.length === 1) {
+    //           inputEl.checked = true
+    //         }
 
-            inputEl.disabled = false
-            inputEl.classList.remove('disabled')
-          } else {
-            inputEl.disabled = true
-            inputEl.classList.add('disabled')
-          }
-        } else {
-          inputEl.disabled = false
-          inputEl.classList.remove('disabled')
-        }
-      })
-    }
+    //         inputEl.disabled = false
+    //         inputEl.classList.remove('disabled')
+    //       } else {
+    //         inputEl.disabled = true
+    //         inputEl.classList.add('disabled')
+    //       }
+    //     } else {
+    //       inputEl.disabled = false
+    //       inputEl.classList.remove('disabled')
+    //     }
+    //   })
+    // }
 
     this.updateAddButtonDom(true, '', false)
     this.compareInputValues()

@@ -96,7 +96,9 @@
         product_form_id: 'product-form-id',
         picker_type: section.settings.picker_type
       %}
-      {% render 'cross-product-picker', cross_products: cross_products %}
+      {% comment %} {% render 'cross-product-picker', cross_products: cross_products %} {% endcomment %}
+
+      {% render 'test-picker', cross_products: cross_products %}
 
       <div class="quantity-row">
         <label for="quantity-control-input">Quantity</label>

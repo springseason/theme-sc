@@ -12,7 +12,11 @@
 
 {%- unless cross_products.empty? -%}
   {% for cross_product in cross_products %}
-    <div class="w-full border-b my-2">
+    <div
+      class="w-full border-b my-2"
+      data-prodify-cross-option-container
+      data-prodify-cross-product-id="{{ cross_product.id }}"
+    >
       <script
         type="application/json"
         data-prodify-cross-product-id="{{ cross_product.id }}"

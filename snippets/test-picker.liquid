@@ -1,0 +1,87 @@
+{% for cross_product in cross_products %}
+  {% comment %} {% assign cpv = cross_product.selected_or_first_available_variant | json %} {% endcomment %}
+  {% assign variants_media_arr = cross_product.variants | map: 'featured_image' %}
+  {% assign defaultSelectedOptions = cross_product.options_with_values | map: 'selected_value' | json | escape %}
+
+  <script
+    type="application/json"
+    data-prodify-cross-product-id="{{ cross_product.id }}"
+    data-prodify-cross-product
+  >
+    {{- cross_product | json -}}
+  </script>
+
+  <div x-data="handleVariantSelect({{ cross_product.id }},{{ defaultSelectedOptions }})">
+    <span x-text="selectedOptions"></span>
+    <span x-text="selectedVariant"></span>
+
+    {% for cross_option in cross_product.options_with_values %}
+      <fieldset>
+        <legend>{{ cross_product.title }} - {{ cross_option.name }}</legend>
+        {%- for value in cross_option.values -%}
+          <input
+            type="radio"
+            x-on:change="onOptionChange($event)"
+            id="{{ section.id }}__cross-option--{{ cross_product.id }}-{{ cross_option.position | minus: 1 }}-{{ forloop.index0 }}"
+            data-option-position="{{ cross_option.position | minus: 1 }}"
+            data-cross-product-id="{{ cross_product.id }}"
+            name="cp-{{ cross_product.id}}-{{ cross_option.name }}"
+            value="{{ value | escape }}"
+            class="hidden [&:checked+label]:bg-indigo-900 [&:checked+label]:text-white"
+            {% if cross_option.selected_value == value %}
+              checked
+            {% endif %}
+            data-x="x"
+          >
+          <label
+            for="{{ section.id }}__cross-option--{{ cross_product.id }}-{{ cross_option.position | minus: 1 }}-{{ forloop.index0 }}"
+            @keyup.enter="$el.click()"
+            class="bg-slate-100 text-black !inline-flex items-center gap-2"
+          >
+            {% if variants_media_arr[forloop.index0] %}
+              <img
+                class="h-4 w-auto svg-active"
+                src="{{ variants_media_arr[forloop.index0] | image_url }}"
+                alt="{{ cross_option.values[forloop.index0] | escape }} option image"
+                width="16"
+                height="16"
+                loading="eager"
+              >
+            {% endif %}
+            {{ value -}}
+            {% comment %} <span class="visually-hidden sr-only">{{ 'products.product.variant_sold_out_or_unavailable' | t }}</span> {% endcomment %}
+          </label>
+        {% endfor %}
+      </fieldset>
+    {% endfor %}
+  </div>
+{% endfor %}
+
+<script>
+  function handleVariantSelect(defaultId, deaultOptions) {
+    return {
+      selectedVariant: null,
+      selectedOptions: null,
+      init() {
+        this.selectedVariant = defaultId;
+        this.selectedOptions = deaultOptions;
+      },
+      onOptionChange(event) {
+        const positionIdx = event.target.dataset.optionPosition;
+        if (positionIdx && event.target.value) this.selectedOptions[positionIdx] = event.target.value;
+        const crossProductId = event.target.dataset.crossProductId;
+        if (!crossProductId) {
+          console.error('CP id not found');
+          return;
+        }
+        const vari = window.prodify.getCrossProductVariant(crossProductId, this.selectedOptions);
+
+        if (!vari.id) {
+          console.error('variant id not found');
+          return;
+        }
+        this.selectedVariant = vari.id;
+      },
+    };
+  }
+</script>
