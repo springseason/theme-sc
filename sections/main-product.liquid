@@ -32,10 +32,6 @@
   data-section="{{ section.id }}"
   data-prodify="{{ section.settings.picker_type }}"
 >
-  <script type="application/json" data-prodify-variants-json>
-    {{- product.variants | json -}}
-  </script>
-
   <a class="skip-to-content-link" href="#product-info-{{ section.id }}"> Skip to product info </a>
   <div class="flex pdp-main" style="position: relative;">
     <div class="media" data-prodify-media-container>
