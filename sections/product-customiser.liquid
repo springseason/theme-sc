@@ -1,5 +1,6 @@
 <div
   class="product-customiser"
+  :class="$store.global.isWindowScrolled ? 'scrolled' : ''"
   data-ajax-cart-section
   x-cloak
 >
@@ -14,21 +15,24 @@
 </div>
 
 <style>
-  /* Main styles */
   .product-customiser-wrapper {
     position: fixed;
-    top: 0px;
-    right: 0px;
-    z-index: 100;
+    bottom: 0;
+    left: 20vw;
+    right: 0;
+    z-index: 99;
   }
 
   .product-customiser {
-    width: 80vw;
-    height: 100vh;
+    height: calc(100vh - 6rem);
     padding: 20px;
     background: #fff;
     border-radius: 6px 0 0 6px;
     box-shadow: 0 30px 130px -8px rgba(0, 0, 0, 0.25);
+  }
+
+  .product-customiser.scrolled {
+    height: calc(100vh - 4rem);
   }
 
   @media (max-width: 576px) {
