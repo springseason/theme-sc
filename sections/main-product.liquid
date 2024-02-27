@@ -24,6 +24,8 @@
 }
 {% endschema %}
 
+{% assign cross_products = product.metafields.custom_option.cross_sell_products.value %}
+
 <div
   class="shopify-section-main-product-inner max-w-[1200px] mx-auto"
   data-handle="{{ product.handle }}"
@@ -57,7 +59,7 @@
           class="absolute h-full w-full object-cover"
           loading="eager"
         >
-        <h1 class="text-4xl z-50 relative">
+        <h1 class="text-4xl z-10 relative">
           {{ product.selected_or_first_available_variant.options }}
         </h1>
       </div>
@@ -80,7 +82,7 @@
 
       <button
         type="button"
-        class="[&>svg]:h-[28px] [&>svg]:w-auto block relative"
+        class="[&>svg]:h-[28px] [&>svg]:w-auto block relative bg-default-text px-3 py-2 border rounded-lg text-white"
         x-data
         @click="$store.global.isCustomiserVisible = true"
         aria-label="{{ block.type }} toggle"
@@ -89,7 +91,6 @@
         Customiser
       </button>
 
-      {% assign cross_products = product.metafields.custom_option.cross_sell_products.value %}
       {% unless cross_products == blank %}
         <div class="flex items-center py-2">
           <span class="sr-only">Price including cross-product options</span>
@@ -201,6 +202,28 @@
     </div>
   </div>
 </div>
+
+{% unless cross_products == blank %}
+  <div
+    class="product-customiser-wrapper"
+    x-data
+    x-show="$store.global.isCustomiserVisible"
+    x-on:click.outside="$store.global.isCustomiserVisible = false"
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="off-screen-right"
+    x-transition:enter-end="right-50"
+    x-transition:leave="transition ease-in duration-300"
+    x-transition:leave-start="right-50"
+    x-transition:leave-end="off-screen-right"
+    x-cloak
+    :aria-hidden="$store.global.isCustomiserVisible ? 'false' : 'true'"
+    aria-modal="true"
+    role="dialog"
+    :class="$store.global.isWindowScrolled ? 'scrolled' : ''"
+  >
+    {% render 'product-customiser', initStep: product, steps: cross_products %}
+  </div>
+{% endunless %}
 
 <style>
   input[type='radio'].out-of-stock + label {

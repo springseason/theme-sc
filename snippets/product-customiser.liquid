@@ -1,0 +1,142 @@
+{% comment %}
+  initStep: product
+  steps: cross_products
+{% endcomment %}
+<div
+  class="product-customiser"
+  :class="$store.global.isWindowScrolled ? 'scrolled' : ''"
+>
+  <div class="title-row">
+    <h2 id="product-customiser-label" class="text-cloud-burst-500">Customiser</h2>
+    <button @click="$store.global.isCustomiserVisible = false">
+      {% render 'icon-close-x' %}
+    </button>
+  </div>
+
+  {% assign steps_count = 0 %}
+
+  <form x-data="{ step: 1 }" x-cloak class="h-full flex flex-col justify-between">
+    <div x-show.transition="step != 'complete'">
+      {% for cross_product in steps %}
+        {% assign steps_count = steps_count | plus: 1 %}
+        <div x-show.transition.in="step === {{ forloop.index }}">
+          <h4>Step {{ forloop.index }}</h4>
+          <p>{{ cross_product.title }}</p>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div x-show.transition="step === 'complete'">
+      <div>
+        <h2>Success</h2>
+        <button @click="step = 1" type="button">Restart</button>
+      </div>
+    </div>
+
+    <div class="" x-show="step != 'complete'">
+      <div class="border-b-2 py-4 flex justify-between items-center">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+          <div class="flex items-center md:w-64">
+            <div class="w-full bg-white rounded-full mr-2">
+              <div
+                class="rounded-full bg-green-500 text-xs leading-none h-2 text-center text-white"
+                :style="'width: '+ parseInt(step / {{ steps_count }} * 100) +'%'"
+              ></div>
+            </div>
+            <div class="text-xs w-10 text-gray-600" x-text="parseInt(step / {{ steps_count }} * 100) +'%'"></div>
+          </div>
+        </div>
+
+        <div>
+          <button
+            x-cloak
+            :disabled="step < 2"
+            @click="step -= 1"
+            type="button"
+            class="underline disabled:text-gray-300"
+          >
+            Back
+          </button>
+          <button
+            x-cloak
+            :disabled="step > {{ steps_count | minus: 1 }}"
+            @click="step += 1"
+            type="button"
+            class="underline disabled:text-gray-300"
+          >
+            Next Step
+          </button>
+          <button
+            x-cloak
+            x-show="step === {{ steps_count }}"
+            @click=" step = 'complete'"
+            type="button"
+            class="underline"
+          >
+            Submit
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<style>
+  .product-customiser-wrapper {
+    position: fixed;
+    top: 6rem;
+    bottom: 0;
+    {% comment %} left: 20vw; {% endcomment %}
+    left: 0;
+    right: 0;
+    z-index: 99;
+  }
+  .product-customiser-wrapper.scrolled {
+    top: 4rem;
+  }
+
+  .product-customiser {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    height: 100%;
+    border-radius: 6px 0 0 6px;
+    box-shadow: 0 30px 130px -8px rgba(0, 0, 0, 0.25);
+    background: #fff;
+  }
+
+  @media (max-width: 576px) {
+    .product-customiser {
+      border-radius: 0;
+    }
+    .product-customiser-wrapper {
+      left: 0;
+    }
+  }
+
+  .product-customiser hr {
+    margin-bottom: 20px;
+  }
+
+  .product-customiser .title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .product-customiser .title-row h2 {
+    margin: 0;
+  }
+
+  .product-customiser .title-row button {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .product-customiser .title-row button svg {
+    display: block;
+    height: 16px;
+  }
+</style>
