@@ -1,53 +1,52 @@
-{% for cross_product in cross_products %}
-  {% assign default_selected_variant_json = cross_product.selected_or_first_available_variant | json | escape %}
-  {% assign cross_product_json = cross_product | json | escape %}
-  <div x-data="handleVariantSelect({{- cross_product_json -}},{{- default_selected_variant_json -}})">
-    <p class="text-sm text-gray-300">
-      Selected {{ cross_product.title }} variant:
-      <span x-text="selectedVariant"></span>
-    </p>
-    {% for cross_option in cross_product.options_with_values %}
-      <fieldset>
-        <legend>{{ cross_product.title }} - {{ cross_option.name }}</legend>
-        {% for value in cross_option.values %}
-          <input
-            type="radio"
-            x-model="selectedOptions[{{ cross_option.position | minus: 1 }}]"
-            x-on:change="onOptionChange"
-            id="{{ section.id }}__cross-option--{{ cross_product.id }}-{{ cross_option.position | minus: 1 }}-{{ forloop.index0 }}"
-            name="cp-{{ cross_product.id}}-{{ cross_option.name }}"
-            value="{{ value | escape }}"
-            class="hidden [&:checked+label]:bg-indigo-900 [&:checked+label]:text-white"
-            {% if cross_option.selected_value == value %}
-              checked
-            {% endif %}
-            data-x="x"
-          >
-          <label
-            for="{{ section.id }}__cross-option--{{ cross_product.id }}-{{ cross_option.position | minus: 1 }}-{{ forloop.index0 }}"
-            @keyup.enter="$el.click()"
-            class="bg-slate-100 text-black !inline-flex items-center gap-2"
-          >
-            {% if cross_product.variants[forloop.index0].featured_image %}
-              <img
-                class="h-4 w-auto svg-active"
-                src="{{ cross_product.variants[forloop.index0].featured_image | image_url }}"
-                alt="{{ value | escape }} option image"
-                width="16"
-                height="16"
-                loading="eager"
-              >
-            {% endif %}
-            {{ value }}
-          </label>
-        {% endfor %}
-      </fieldset>
-    {% endfor %}
-  </div>
-{% endfor %}
+{% assign default_selected_variant_json = cross_product.selected_or_first_available_variant | json | escape %}
+{% assign cross_product_json = cross_product | json | escape %}
+
+<div x-data="handleVariantSelect({{- cross_product_json -}},{{- default_selected_variant_json -}})">
+  <span x-text="selectedVariant" class="text-sm text-gray-300"></span>
+  <hr class="mt-2">
+  {% for cross_option in cross_product.options_with_values %}
+    <fieldset>
+      <legend>{{ cross_product.title }} - {{ cross_option.name }}</legend>
+      {% for value in cross_option.values %}
+        <input
+          type="radio"
+          x-model="selectedOptions[{{ cross_option.position | minus: 1 }}]"
+          x-on:change="onOptionChange"
+          id="{{ section.id }}__cross-option--{{ cross_product.id }}-{{ cross_option.position | minus: 1 }}-{{ forloop.index0 }}"
+          name="cp-{{ cross_product.id}}-{{ cross_option.name }}"
+          value="{{ value | escape }}"
+          class="hidden [&:checked+label]:bg-indigo-900 [&:checked+label]:text-white"
+          {% if cross_option.selected_value == value %}
+            checked
+          {% endif %}
+          data-x="x"
+        >
+        <label
+          for="{{ section.id }}__cross-option--{{ cross_product.id }}-{{ cross_option.position | minus: 1 }}-{{ forloop.index0 }}"
+          @keyup.enter="$el.click()"
+          class="bg-slate-100 text-black !inline-flex items-center gap-2"
+        >
+          {% if cross_product.variants[forloop.index0].featured_image %}
+            <img
+              class="h-4 w-auto svg-active"
+              src="{{ cross_product.variants[forloop.index0].featured_image | image_url }}"
+              alt="{{ value | escape }} option image"
+              width="16"
+              height="16"
+              loading="eager"
+            >
+          {% endif %}
+          {{ value }}
+        </label>
+      {% endfor %}
+    </fieldset>
+  {% endfor %}
+</div>
 
 <script>
   function handleVariantSelect(crossProduct, defaultSelectedVariant) {
+    const crossProductsStore = window.Alpine.store('global');
+
     return {
       selectedVariant: null,
       selectedOptions: [],
@@ -56,6 +55,7 @@
           console.error('invalid init data');
         }
         this.selectedVariant = defaultSelectedVariant.id;
+        crossProductsStore.updateCrossProduct(crossProduct.id, defaultSelectedVariant);
         this.selectedOptions = defaultSelectedVariant.options;
       },
       onOptionChange() {
@@ -69,10 +69,57 @@
         if (!selectedVariant?.id) {
           console.error('variant id not found');
           this.selectedVariant = null;
+          window.Alpine.store('global').updateCrossProduct(crossProduct.id, null);
           return;
         }
         this.selectedVariant = selectedVariant.id;
+        crossProductsStore.updateCrossProduct(crossProduct.id, selectedVariant);
+
+        console.log(crossProductsStore.crossProducts);
       },
     };
   }
 </script>
+
+<style>
+  .section-main-product .product-customiser-wrapper fieldset {
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .section-main-product .product-customiser-wrapper fieldset legend {
+    font-size: 13px;
+    letter-spacing: 0.4px;
+    line-height: 19.5px;
+    color: rgba(26, 27, 24, 0.75);
+    margin-bottom: 16px;
+  }
+
+  .section-main-product .product-customiser-wrapper fieldset label {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 40px;
+    letter-spacing: 1px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  body:not(.using-mouse)
+    .section-main-product
+    .shopify-section-main-product-inner
+    .flex
+    .info
+    fieldset
+    input:focus
+    + label {
+    outline: #08f auto 2px;
+  }
+
+  .section-main-product .product-customiser-wrapper fieldset input[disabled] + label {
+    background-color: transparent;
+    color: lightgray;
+    cursor: default;
+  }
+</style>

@@ -41,6 +41,10 @@
     animation: dots 1.2s steps(5, end) infinite;
   }
 
+  button.util {
+    @apply text-default-button-label bg-default-button px-3 py-2 rounded-lg ml-auto mr-auto uppercase text-sm
+  }
+
   @keyframes dots {
 
     0%,

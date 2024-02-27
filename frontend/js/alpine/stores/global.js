@@ -7,6 +7,7 @@ export default {
       isPredictiveSearchVisible: false,
       isCustomiserVisible: false,
       isWindowScrolled: false,
+      crossProducts: {},
       cart: null,
       init() {
         window.addEventListener('scroll', this.onWindowScrollHandler.bind(this))
@@ -54,6 +55,9 @@ export default {
           }
           this.cart = cart
         })
+      },
+      updateCrossProduct(crossProductId, crossProductVariant) {
+        Object.assign(this.crossProducts, { [crossProductId]: crossProductVariant })
       }
     }
   }

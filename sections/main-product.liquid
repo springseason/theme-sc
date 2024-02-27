@@ -93,7 +93,7 @@
       <div class="py-2 md:py-6">
         <button
           type="button"
-          class="[&>svg]:h-[28px] [&>svg]:w-auto block relative text-default-button-label bg-default-button px-3 py-2 rounded-lg  ml-auto mr-auto"
+          class="[&>svg]:h-[28px] [&>svg]:w-auto block relative util"
           x-data
           @click="$store.global.isCustomiserVisible = true"
           aria-label="{{ block.type }} toggle"
@@ -109,7 +109,7 @@
         picker_type: section.settings.picker_type
       %}
 
-      {% render 'crossproduct-picker', cross_products: cross_products %}
+      {% comment %} {% render 'crossproduct-picker', cross_products: cross_products %} {% endcomment %}
 
       <div class="quantity-row">
         <label for="quantity-control-input">Quantity</label>
