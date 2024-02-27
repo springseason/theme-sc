@@ -12,27 +12,44 @@
   </div>
   <hr>
   <hr>
+
+  <form x-data="{ formStep: 1 }" class="h-full flex flex-col justify-between">
+    <div class="">
+      <div x-cloak x-show="formStep === 1">Step 1</div>
+      <div x-cloak x-show="formStep === 2">Step 2</div>
+      <div x-cloak x-show="formStep === 3">Step 3</div>
+      <div x-cloak x-show="formStep === 4">Final Step</div>
+    </div>
+
+    <div class="">
+      <button x-cloak x-show="formStep > 1" @click="formStep -= 1" type="button" class="underline">Back</button>
+      <button x-cloak x-show="formStep < 4" @click="formStep += 1" type="button" class="underline">Next Step</button>
+      <button x-cloak x-show="formStep === 4" type="submit" class="underline">Submit</button>
+    </div>
+  </form>
 </div>
 
 <style>
   .product-customiser-wrapper {
     position: fixed;
-    bottom: 0;
+    top: 6rem;
+    bottom: 0rem;
     left: 20vw;
     right: 0;
     z-index: 99;
   }
-
-  .product-customiser {
-    height: calc(100vh - 6rem);
-    padding: 20px;
-    background: #fff;
-    border-radius: 6px 0 0 6px;
-    box-shadow: 0 30px 130px -8px rgba(0, 0, 0, 0.25);
+  .product-customiser-wrapper.scrolled {
+    top: 4rem;
   }
 
-  .product-customiser.scrolled {
-    height: calc(100vh - 4rem);
+  .product-customiser {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    height: 100%;
+    border-radius: 6px 0 0 6px;
+    box-shadow: 0 30px 130px -8px rgba(0, 0, 0, 0.25);
+    background: #fff;
   }
 
   @media (max-width: 576px) {
@@ -68,3 +85,11 @@
     height: 16px;
   }
 </style>
+
+{% schema %}
+{
+  "name": "Product Customiser",
+  "tag": "section",
+  "class": "full"
+}
+{% endschema %}

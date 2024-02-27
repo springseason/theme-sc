@@ -103,6 +103,7 @@
       :aria-hidden="$store.global.isCustomiserVisible ? 'false' : 'true'"
       aria-modal="true"
       role="dialog"
+      :class="$store.global.isWindowScrolled ? 'scrolled' : ''"
     >
       {% section 'product-customiser' %}
     </div>
