@@ -2,7 +2,10 @@
   {% assign default_selected_variant_json = cross_product.selected_or_first_available_variant | json | escape %}
   {% assign cross_product_json = cross_product | json | escape %}
   <div x-data="handleVariantSelect({{- cross_product_json -}},{{- default_selected_variant_json -}})">
-    <span x-text="selectedVariant"></span>
+    <p class="text-sm text-gray-300">
+      Selected {{ cross_product.title }} variant:
+      <span x-text="selectedVariant"></span>
+    </p>
     {% for cross_option in cross_product.options_with_values %}
       <fieldset>
         <legend>{{ cross_product.title }} - {{ cross_option.name }}</legend>
@@ -63,8 +66,9 @@
           const variantOptions = cpVariant.options;
           return variantOptions.every((option, index) => option === this.selectedOptions[index]);
         });
-        if (!selectedVariant.id) {
+        if (!selectedVariant?.id) {
           console.error('variant id not found');
+          this.selectedVariant = null;
           return;
         }
         this.selectedVariant = selectedVariant.id;
