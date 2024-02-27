@@ -78,6 +78,17 @@
         </span>
       </div>
 
+      <button
+        type="button"
+        class="[&>svg]:h-[28px] [&>svg]:w-auto block relative"
+        x-data
+        @click="$store.global.isCustomiserVisible = true"
+        aria-label="{{ block.type }} toggle"
+        :aria-expanded="$store.global.isCustomiserVisible ? 'true' : 'false'"
+      >
+        Customiser
+      </button>
+
       {% assign cross_products = product.metafields.custom_option.cross_sell_products.value %}
       {% unless cross_products == blank %}
         <div class="flex items-center py-2">
@@ -92,7 +103,6 @@
         product_form_id: 'product-form-id',
         picker_type: section.settings.picker_type
       %}
-      {% comment %} {% render 'cross-product-picker', cross_products: cross_products %} {% endcomment %}
 
       {% render 'crossproduct-picker', cross_products: cross_products %}
 

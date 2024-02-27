@@ -88,6 +88,25 @@
       {% section 'minicart' %}
     </div>
 
+    <div
+      class="product-customiser-wrapper"
+      x-data
+      x-show="$store.global.isCustomiserVisible"
+      x-on:click.outside="$store.global.isCustomiserVisible = false"
+      x-transition:enter="transition ease-out duration-300"
+      x-transition:enter-start="off-screen-right"
+      x-transition:enter-end="right-50"
+      x-transition:leave="transition ease-in duration-300"
+      x-transition:leave-start="right-50"
+      x-transition:leave-end="off-screen-right"
+      x-cloak
+      :aria-hidden="$store.global.isCustomiserVisible ? 'false' : 'true'"
+      aria-modal="true"
+      role="dialog"
+    >
+      {% section 'product-customiser' %}
+    </div>
+
     {% if settings.enable_predictive_search %}
       {% section 'predictive-search-main' %}
     {% endif %}

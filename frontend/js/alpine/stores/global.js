@@ -5,6 +5,7 @@ export default {
       isMobileMenuVisible: false,
       isMinicartVisible: false,
       isPredictiveSearchVisible: false,
+      isCustomiserVisible: false,
       isWindowScrolled: false,
       cart: null,
       init() {
@@ -35,7 +36,6 @@ export default {
         this.isWindowScrolled = isScrolled
         document.body.classList[isScrolled ? 'add' : 'remove']('scrolled')
       },
-
       configAjaxCart() {
         window.liquidAjaxCart.conf('updateOnWindowFocus', false)
         window.liquidAjaxCart.conf('mutations', [removeCrossProductsWithoutMain])

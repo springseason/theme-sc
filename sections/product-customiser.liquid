@@ -1,0 +1,66 @@
+<div
+  class="product-customiser"
+  data-ajax-cart-section
+  x-cloak
+>
+  <div class="title-row">
+    <h2 id="product-customiser-label" class="text-cloud-burst-500">Customiser</h2>
+    <button @click="$store.global.isCustomiserVisible = false">
+      {% render 'icon-close-x' %}
+    </button>
+  </div>
+  <hr>
+  <hr>
+</div>
+
+<style>
+  /* Main styles */
+  .product-customiser-wrapper {
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    z-index: 100;
+  }
+
+  .product-customiser {
+    width: 80vw;
+    height: 100vh;
+    padding: 20px;
+    background: #fff;
+    border-radius: 6px 0 0 6px;
+    box-shadow: 0 30px 130px -8px rgba(0, 0, 0, 0.25);
+  }
+
+  @media (max-width: 576px) {
+    .product-customiser {
+      width: 100vw;
+      border-radius: 0;
+    }
+  }
+
+  .product-customiser hr {
+    margin-bottom: 20px;
+  }
+
+  .product-customiser .title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .product-customiser .title-row h2 {
+    margin: 0;
+  }
+
+  .product-customiser .title-row button {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .product-customiser .title-row button svg {
+    display: block;
+    height: 16px;
+  }
+</style>
