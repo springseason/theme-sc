@@ -80,24 +80,28 @@
         </span>
       </div>
 
-      <button
-        type="button"
-        class="[&>svg]:h-[28px] [&>svg]:w-auto block relative bg-default-text px-3 py-2 border rounded-lg text-white"
-        x-data
-        @click="$store.global.isCustomiserVisible = true"
-        aria-label="{{ block.type }} toggle"
-        :aria-expanded="$store.global.isCustomiserVisible ? 'true' : 'false'"
-      >
-        Customiser
-      </button>
+      {% comment %}
+        {% unless cross_products == blank %}
+          <div class="flex items-center py-2">
+            <span class="sr-only">Price including cross-product options</span>
+            {% comment %} PRODIFY fills it {% endcomment %}
+            <span id="total-price">&nbsp;</span>
+          </div>
+        {% endunless %}
+      {% endcomment %}
 
-      {% unless cross_products == blank %}
-        <div class="flex items-center py-2">
-          <span class="sr-only">Price including cross-product options</span>
-          {% comment %} PRODIFY fills it {% endcomment %}
-          <span id="total-price">&nbsp;</span>
-        </div>
-      {% endunless %}
+      <div class="py-2 md:py-6">
+        <button
+          type="button"
+          class="[&>svg]:h-[28px] [&>svg]:w-auto block relative text-default-button-label bg-default-button px-3 py-2 rounded-lg  ml-auto mr-auto"
+          x-data
+          @click="$store.global.isCustomiserVisible = true"
+          aria-label="{{ block.type }} toggle"
+          :aria-expanded="$store.global.isCustomiserVisible ? 'true' : 'false'"
+        >
+          Customise
+        </button>
+      </div>
 
       {% render 'product-variant-picker',
         product: product,
