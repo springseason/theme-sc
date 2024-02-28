@@ -17,15 +17,19 @@
 
   {% assign steps_count = 0 %}
 
-  <form x-data="{ step: 1 }" x-cloak class="h-full flex flex-col justify-between">
-    <div x-show.transition="step != 'complete'">
+  <form
+    x-data="customiser"
+    x-cloak
+    class="h-full flex flex-col justify-between"
+  >
+    <div x-show.transition="step !== 'complete'">
       {% for cross_product in steps %}
         {% assign steps_count = steps_count | plus: 1 %}
         <div x-show.transition.in="step === {{ forloop.index }}">
           <div class="subtitle-row">
             <h3>Step {{ forloop.index }}</h3>
           </div>
-          {% render 'crossproduct-picker', cross_product: cross_product, where: "customiser" %}
+          {% render 'crossproduct-picker', cross_product: cross_product, where: 'customiser' %}
         </div>
       {% endfor %}
     </div>
@@ -41,10 +45,9 @@
             ></span>
           </li>
         </template>
-        <button @click="step = 1" type="button" class="util">Restart</button>
+        <button @click="reset" type="button" class="util">Restart</button>
       </div>
     </div>
-
     <div class="" x-show="step != 'complete'">
       <div class="py-4 flex justify-between items-center">
         <div class="flex flex-row md:items-center md:justify-between flex-1 md:flex-0">
@@ -62,7 +65,7 @@
           <button
             x-cloak
             :disabled="step < 2"
-            @click="step -= 1"
+            @click="prevStep"
             type="button"
             class="underline disabled:text-gray-300"
           >
@@ -71,7 +74,7 @@
           <button
             x-cloak
             :disabled="step > {{ steps_count | minus: 1 }}"
-            @click="step += 1"
+            @click="nextStep({{ steps_count }})"
             type="button"
             class="underline disabled:text-gray-300"
           >
@@ -80,7 +83,7 @@
           <button
             x-cloak
             x-show="step === {{ steps_count }}"
-            @click=" step = 'complete'"
+            @click="completeForm"
             type="button"
             class="underline "
           >
@@ -93,65 +96,64 @@
 </div>
 
 <style>
-    .product-customiser-wrapper {
-      position: fixed;
-      top: 6rem;
-      bottom: 0;
-      {% comment %} left: 20vw; {% endcomment %}
-      left: 0;
-      right: 0;
-      z-index: 99;
-    }
-    .product-customiser-wrapper.scrolled {
-      top: 4rem;
-    }
+  .product-customiser-wrapper {
+    position: fixed;
+    top: 6rem;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 99;
+  }
+  .product-customiser-wrapper.scrolled {
+    top: 4rem;
+  }
 
+  .product-customiser {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    height: 100%;
+    border-radius: 6px 0 0 6px;
+    box-shadow: 0 30px 130px -8px rgba(0, 0, 0, 0.25);
+    background: #fff;
+  }
+
+  @media (max-width: 576px) {
     .product-customiser {
-      display: flex;
-      flex-direction: column;
-      padding: 20px;
-      height: 100%;
-      border-radius: 6px 0 0 6px;
-      box-shadow: 0 30px 130px -8px rgba(0, 0, 0, 0.25);
-      background: #fff;
+      border-radius: 0;
     }
-
-    @media (max-width: 576px) {
-      .product-customiser {
-        border-radius: 0;
-      }
-      .product-customiser-wrapper {
-        left: 0;
-      }
+    .product-customiser-wrapper {
+      left: 0;
     }
+  }
 
-    .product-customiser hr {
-      margin-bottom: 20px;
-    }
+  .product-customiser hr {
+    margin-bottom: 20px;
+  }
 
-    .product-customiser .title-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
+  .product-customiser .title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
 
-    .product-customiser .title-row h2 {
-      margin: 0;
-    }
+  .product-customiser .title-row h2 {
+    margin: 0;
+  }
 
-    .product-customiser .title-row button {
-      border: none;
-      background: transparent;
-      cursor: pointer;
-    }
+  .product-customiser .title-row button {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+  }
 
-    .product-customiser .title-row button svg {
-      display: block;
-      height: 16px;
-    }
+  .product-customiser .title-row button svg {
+    display: block;
+    height: 16px;
+  }
 
-    .subtitle-row {
+  .subtitle-row {
     margin-bottom: 5px;
   }
 </style>

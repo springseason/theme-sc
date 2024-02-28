@@ -1,11 +1,15 @@
 {% comment %}
+  cross_product: item of cross_products
   where: "customiser"
 {% endcomment %}
+
 {% assign default_selected_variant_json = cross_product.selected_or_first_available_variant | json | escape %}
 {% assign cross_product_json = cross_product | json | escape %}
 {% assign where = where | default: 'pdp' | append: '__' %}
 
-<div x-data="handleVariantSelect({{- cross_product_json -}},{{- default_selected_variant_json -}})">
+<div
+  x-data="handleCrossProductSelect({{- cross_product_json -}},{{- default_selected_variant_json -}})"
+>
   <span x-text="selectedVariant" class="text-sm text-gray-300"></span>
   <hr class="mt-2">
   {% for cross_option in cross_product.options_with_values %}
@@ -23,7 +27,6 @@
           {% if cross_option.selected_value == value %}
             checked
           {% endif %}
-          data-x="x"
         >
         <label
           for="{{ section.id }}__{{ where }}cross-option--{{ cross_product.id }}-{{ cross_option.position | minus: 1 }}-{{ forloop.index0 }}"
@@ -48,27 +51,48 @@
 </div>
 
 <script>
-  function handleVariantSelect(crossProduct, defaultSelectedVariant) {
+  function handleCrossProductSelect(crossProduct, defaultSelectedVariant) {
     const crossProductsStore = window.Alpine.store('crossProducts');
+
+    if (!crossProduct.id) {
+      throw new Error('Invalid Cross product.');
+    }
+
+    if (!crossProductsStore.current) {
+      throw new Error('Cross product strore not found.');
+    }
+
+    if (!defaultSelectedVariant.id || !defaultSelectedVariant.options.length) {
+      throw new Error('Default selected variant is unavailable.');
+    }
+
     const preselected = crossProductsStore.current[crossProduct.id];
 
     return {
       selectedVariant: null,
       selectedOptions: [],
       init() {
+        // other instance of the picker already set / changed the default selection
         if (preselected) {
           this.selectedVariant = preselected.id;
           this.selectedOptions = preselected.options;
-          console.info('cross product already registered, updating local state');
-          return;
+        } else {
+          this.selectedVariant = defaultSelectedVariant.id;
+          this.selectedOptions = defaultSelectedVariant.options;
+          crossProductsStore.updateCrossProduct(crossProduct.id, defaultSelectedVariant);
         }
 
-        if (!defaultSelectedVariant?.id || !defaultSelectedVariant?.options?.length) {
-          console.error('invalid init data');
-        }
-        this.selectedVariant = defaultSelectedVariant.id;
-        crossProductsStore.updateCrossProduct(crossProduct.id, defaultSelectedVariant);
-        this.selectedOptions = defaultSelectedVariant.options;
+        // on crossProducts reset
+        window.Alpine.effect(() => {
+          const idStr = JSON.stringify(crossProduct.id);
+          const currenctCrossProductIds = Object.keys(crossProductsStore.current);
+
+          if (!currenctCrossProductIds.includes(idStr)) {
+            this.selectedVariant = defaultSelectedVariant.id;
+            this.selectedOptions = defaultSelectedVariant.options;
+            crossProductsStore.updateCrossProduct(crossProduct.id, defaultSelectedVariant);
+          }
+        });
       },
       onOptionChange() {
         if (!crossProduct?.variants?.length || !this.selectedOptions?.length) {
