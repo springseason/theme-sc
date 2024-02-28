@@ -2,13 +2,14 @@
   initStep: product
   steps: cross_products
 {% endcomment %}
+
 <div
   class="product-customiser"
   :class="$store.global.isWindowScrolled ? 'scrolled' : ''"
 >
   <div class="title-row">
     <h2 id="product-customiser-label" class="text-cloud-burst-500">Customiser</h2>
-    <button @click="$store.global.isCustomiserVisible = false">
+    <button @click="$store.crossProducts.isCustomiserVisible = false">
       {% render 'icon-close-x' %}
     </button>
   </div>
@@ -30,13 +31,13 @@
     </div>
 
     <div x-show.transition="step === 'complete'">
-      <div x-data="$store.global.crossProducts">
+      <div x-data="$store.crossProducts.current">
         <h3>Success</h3>
-        <template x-for="(value, index) in $store.global.crossProducts">
+        <template x-for="(value, index) in $store.crossProducts.current">
           <li>
             <span x-text="index"></span>:
             <span
-              x-text="value.title + '_s selected variant id: ' + value.id + ' with options: ' + JSON.stringify(value.options)"
+              x-text="value ? value?.title + '_s selected variant id: ' + value?.id + ' with options: ' + JSON.stringify(value?.options) : 'variant is unavailable'"
             ></span>
           </li>
         </template>

@@ -5,7 +5,6 @@ export default {
       isMobileMenuVisible: false,
       isMinicartVisible: false,
       isPredictiveSearchVisible: false,
-      isCustomiserVisible: false,
       isWindowScrolled: false,
       crossProducts: {},
       cart: null,
@@ -55,9 +54,6 @@ export default {
           }
           this.cart = cart
         })
-      },
-      updateCrossProduct(crossProductId, crossProductVariant) {
-        Object.assign(this.crossProducts, { [crossProductId]: crossProductVariant })
       }
     }
   }

@@ -95,9 +95,9 @@
           type="button"
           class="[&>svg]:h-[28px] [&>svg]:w-auto block relative util"
           x-data
-          @click="$store.global.isCustomiserVisible = true"
+          @click="$store.crossProducts.isCustomiserVisible = true"
           aria-label="{{ block.type }} toggle"
-          :aria-expanded="$store.global.isCustomiserVisible ? 'true' : 'false'"
+          :aria-expanded="$store.crossProducts.isCustomiserVisible ? 'true' : 'false'"
         >
           Customise
         </button>
@@ -211,8 +211,8 @@
   <div
     class="product-customiser-wrapper"
     x-data
-    x-show="$store.global.isCustomiserVisible"
-    x-on:click.outside="$store.global.isCustomiserVisible = false"
+    x-show="$store.crossProducts.isCustomiserVisible"
+    x-on:click.outside="$store.crossProducts.isCustomiserVisible = false"
     x-transition:enter="transition ease-out duration-300"
     x-transition:enter-start="off-screen-right"
     x-transition:enter-end="right-50"
@@ -220,7 +220,7 @@
     x-transition:leave-start="right-50"
     x-transition:leave-end="off-screen-right"
     x-cloak
-    :aria-hidden="$store.global.isCustomiserVisible ? 'false' : 'true'"
+    :aria-hidden="$store.crossProducts.isCustomiserVisible ? 'false' : 'true'"
     aria-modal="true"
     role="dialog"
     :class="$store.global.isWindowScrolled ? 'scrolled' : ''"

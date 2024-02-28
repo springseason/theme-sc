@@ -45,7 +45,7 @@
 
 <script>
   function handleVariantSelect(crossProduct, defaultSelectedVariant) {
-    const crossProductsStore = window.Alpine.store('global');
+    const crossProductsStore = window.Alpine.store('crossProducts');
 
     return {
       selectedVariant: null,
@@ -69,13 +69,11 @@
         if (!selectedVariant?.id) {
           console.error('variant id not found');
           this.selectedVariant = null;
-          window.Alpine.store('global').updateCrossProduct(crossProduct.id, null);
+          crossProductsStore.updateCrossProduct(crossProduct.id, null);
           return;
         }
         this.selectedVariant = selectedVariant.id;
         crossProductsStore.updateCrossProduct(crossProduct.id, selectedVariant);
-
-        console.log(crossProductsStore.crossProducts);
       },
     };
   }
