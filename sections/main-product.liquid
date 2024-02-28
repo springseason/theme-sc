@@ -34,6 +34,10 @@
   data-section="{{ section.id }}"
   data-prodify="{{ section.settings.picker_type }}"
 >
+  <script type="application/json" data-prodify-variants-json>
+    {{- product.variants | json -}}
+  </script>
+
   <a class="skip-to-content-link" href="#product-info-{{ section.id }}"> Skip to product info </a>
   <div class="flex pdp-main" style="position: relative;">
     <div class="media" data-prodify-media-container>
@@ -109,7 +113,11 @@
         picker_type: section.settings.picker_type
       %}
 
-      {% comment %} {% render 'crossproduct-picker', cross_products: cross_products %} {% endcomment %}
+      {% unless cross_products == blank %}
+        {% for cross_product in cross_products %}
+          {% render 'crossproduct-picker', cross_product: cross_product, cross_product %}
+        {% endfor %}
+      {% endunless %}
 
       <div class="quantity-row">
         <label for="quantity-control-input">Quantity</label>
@@ -212,7 +220,7 @@
     class="product-customiser-wrapper"
     x-data
     x-show="$store.crossProducts.isCustomiserVisible"
-    x-on:click.outside="$store.crossProducts.isCustomiserVisible = false"
+    {% comment %} x-on:click.outside="$store.crossProducts.isCustomiserVisible = false" {% endcomment %}
     x-transition:enter="transition ease-out duration-300"
     x-transition:enter-start="off-screen-right"
     x-transition:enter-end="right-50"

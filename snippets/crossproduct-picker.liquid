@@ -1,5 +1,9 @@
+{% comment %}
+  where: "customiser"
+{% endcomment %}
 {% assign default_selected_variant_json = cross_product.selected_or_first_available_variant | json | escape %}
 {% assign cross_product_json = cross_product | json | escape %}
+{% assign where = where | default: 'pdp' | append: '__' %}
 
 <div x-data="handleVariantSelect({{- cross_product_json -}},{{- default_selected_variant_json -}})">
   <span x-text="selectedVariant" class="text-sm text-gray-300"></span>
@@ -12,7 +16,7 @@
           type="radio"
           x-model="selectedOptions[{{ cross_option.position | minus: 1 }}]"
           x-on:change="onOptionChange"
-          id="{{ section.id }}__cross-option--{{ cross_product.id }}-{{ cross_option.position | minus: 1 }}-{{ forloop.index0 }}"
+          id="{{ section.id }}__{{ where }}cross-option--{{ cross_product.id }}-{{ cross_option.position | minus: 1 }}-{{ forloop.index0 }}"
           name="cp-{{ cross_product.id}}-{{ cross_option.name }}"
           value="{{ value | escape }}"
           class="hidden [&:checked+label]:bg-indigo-900 [&:checked+label]:text-white"
@@ -22,7 +26,7 @@
           data-x="x"
         >
         <label
-          for="{{ section.id }}__cross-option--{{ cross_product.id }}-{{ cross_option.position | minus: 1 }}-{{ forloop.index0 }}"
+          for="{{ section.id }}__{{ where }}cross-option--{{ cross_product.id }}-{{ cross_option.position | minus: 1 }}-{{ forloop.index0 }}"
           @keyup.enter="$el.click()"
           class="bg-slate-100 text-black !inline-flex items-center gap-2"
         >
@@ -46,11 +50,19 @@
 <script>
   function handleVariantSelect(crossProduct, defaultSelectedVariant) {
     const crossProductsStore = window.Alpine.store('crossProducts');
+    const preselected = crossProductsStore.current[crossProduct.id];
 
     return {
       selectedVariant: null,
       selectedOptions: [],
       init() {
+        if (preselected) {
+          this.selectedVariant = preselected.id;
+          this.selectedOptions = preselected.options;
+          console.info('cross product already registered, updating local state');
+          return;
+        }
+
         if (!defaultSelectedVariant?.id || !defaultSelectedVariant?.options?.length) {
           console.error('invalid init data');
         }

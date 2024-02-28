@@ -199,7 +199,7 @@ class Prodify {
           addButtonTarget.replaceWith(addButtonSource)
         }
       })
-      .then(() => callback())
+      .then(() => (callback ? callback() : null))
   }
   getVariantData = () => {
     this.variantData = this.variantData || JSON.parse(this.el.querySelector(this.selectors.variantsJson).textContent)

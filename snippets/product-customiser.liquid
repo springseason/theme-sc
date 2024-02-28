@@ -25,7 +25,7 @@
           <div class="subtitle-row">
             <h3>Step {{ forloop.index }}</h3>
           </div>
-          {% render 'crossproduct-picker', cross_product: cross_product %}
+          {% render 'crossproduct-picker', cross_product: cross_product, where: "customiser" %}
         </div>
       {% endfor %}
     </div>
