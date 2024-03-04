@@ -15,24 +15,26 @@
   </div>
   <hr>
 
-  {% assign steps_count = 0 %}
-
   <form
     x-data="customiser"
-    x-cloak
-    class="h-full flex flex-col justify-between"
+    class="h-full flex flex-col relative"
   >
-    <div x-show.transition="step !== 'complete'">
-      {% for cross_product in steps %}
-        {% assign steps_count = steps_count | plus: 1 %}
-        <div x-show.transition.in="step === {{ forloop.index }}">
-          <div class="subtitle-row">
-            <h3>Step {{ forloop.index }}</h3>
-          </div>
-          {% render 'crossproduct-picker', cross_product: cross_product, where: 'customiser' %}
-        </div>
-      {% endfor %}
-    </div>
+    {% for cross_product in steps %}
+      {% assign steps_count = forloop.index %}
+      <div
+        x-show="step === {{ steps_count }}"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-out duration-200"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        :key="{{ steps_count }}"
+        class="absolute top-0"
+      >
+        {% render 'cp-picker', cross_product: cross_product, where: 'customiser' %}
+      </div>
+    {% endfor %}
 
     <div x-show.transition="step === 'complete'">
       <div x-data="$store.crossProducts.current">
@@ -41,55 +43,54 @@
           <li>
             <span x-text="index"></span>:
             <span
-              x-text="value ? value?.title + '_s selected variant id: ' + value?.id + ' with options: ' + JSON.stringify(value?.options) : 'variant is unavailable'"
+              x-text="value.variant ? value?.variant.title + '_s selected variant id: ' + value?.variant.id + ' with options: ' + JSON.stringify(value?.variant.options) : 'variant is unavailable'"
             ></span>
           </li>
         </template>
         <button @click="reset" type="button" class="util">Restart</button>
       </div>
     </div>
-    <div class="" x-show="step != 'complete'">
-      <div class="py-4 flex justify-between items-center">
-        <div class="flex flex-row md:items-center md:justify-between flex-1 md:flex-0">
-          <div class="flex items-center w-1/2 md:w-64">
-            <div class="w-full bg-gray-100 rounded-full mr-2">
-              <div
-                class="rounded-full bg-default-text text-xs leading-none h-2 text-center text-white"
-                :style="'width: '+ parseInt(step / {{ steps_count }} * 100) +'%'"
-              ></div>
-            </div>
+
+    <div x-show="step != 'complete'" class="fixed bottom-0 left-0 right-0 py-4 px-5 flex justify-between items-center">
+      <div class="flex flex-row md:items-center md:justify-between flex-1 md:flex-0">
+        <div class="flex items-center w-full">
+          <div class="w-full bg-gray-100 rounded-full mr-2">
+            <div
+              class="rounded-full bg-default-text text-xs leading-none h-2 text-center text-white"
+              :style="'width: '+ parseInt(step / {{ steps_count }} * 100) +'%'"
+            ></div>
           </div>
         </div>
+      </div>
 
-        <div class="flex gap-2 md:gap-10">
-          <button
-            x-cloak
-            :disabled="step < 2"
-            @click="prevStep"
-            type="button"
-            class="underline disabled:text-gray-300"
-          >
-            Back
-          </button>
-          <button
-            x-cloak
-            :disabled="step > {{ steps_count | minus: 1 }}"
-            @click="nextStep({{ steps_count }})"
-            type="button"
-            class="underline disabled:text-gray-300"
-          >
-            Next Step
-          </button>
-          <button
-            x-cloak
-            x-show="step === {{ steps_count }}"
-            @click="completeForm"
-            type="button"
-            class="underline "
-          >
-            Submit
-          </button>
-        </div>
+      <div class="flex flex-1 justify-end gap-2 md:gap-10">
+        <button
+          x-cloak
+          x-show="step === {{ steps_count }}"
+          @click="completeForm"
+          type="button"
+          class="underline "
+        >
+          Submit
+        </button>
+        <button
+          x-cloak
+          :disabled="step < 2"
+          @click="prevStep"
+          type="button"
+          class="underline disabled:text-gray-300"
+        >
+          Back
+        </button>
+        <button
+          x-cloak
+          :disabled="step > {{ steps_count | minus: 1 }}"
+          @click="nextStep({{ steps_count }})"
+          type="button"
+          class="underline disabled:text-gray-300"
+        >
+          Next Step
+        </button>
       </div>
     </div>
   </form>

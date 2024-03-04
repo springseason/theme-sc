@@ -115,7 +115,7 @@
 
       {% unless cross_products == blank %}
         {% for cross_product in cross_products %}
-          {% render 'crossproduct-picker', cross_product: cross_product, cross_product %}
+          {% render 'cp-picker', cross_product: cross_product %}
         {% endfor %}
       {% endunless %}
 

@@ -1,0 +1,118 @@
+{% comment %}
+  cross_product
+{% endcomment %}
+
+{% assign defaultSelectedOptions = cross_product.options_with_values | map: 'selected_value' | json | escape %}
+{% assign where = where | default: 'pdp' | append: '__' %}
+
+<div
+  x-data="crossProductPicker({{ cross_product.id }},{{ defaultSelectedOptions }})"
+  x-init="
+        $watch('$store.crossProducts.current', (current, old) => {
+    const currentVari = current['{{ cross_product.id }}']?.variant
+    const stateOptions = currentVari?.options
+
+    // other instance of the option has changed
+    if (stateOptions && currentVariant.options !== stateOptions) {
+
+      currentOptions = stateOptions
+      currentVariant = currentVari
+
+    // crossProducts resetted
+    } else if (!stateOptions) {
+      init()
+    }})
+  "
+>
+  <script type="application/json" data-xp-variants>
+    {{- cross_product.variants | json -}}
+  </script>
+
+  {% for cross_option in cross_product.options_with_values %}
+    {% assign outerLoop = forloop.index0 %}
+    <fieldset
+      x-on:change="handleUserInput"
+      data-idx="{{ outerLoop }}"
+    >
+      <legend>
+        {{ cross_product.title }} - {{ cross_option.name }}
+        {{ options }}
+      </legend>
+      {% for value in cross_option.values %}
+        <input
+          type="radio"
+          id="{{ section.id }}__{{ where }}cross-option--{{ cross_product.id }}-{{ cross_option.position | minus: 1 }}-{{ forloop.index0 }}"
+          name="cp-{{ cross_product.id}}-{{ cross_option.name }}"
+          value="{{ value | escape }}"
+          class="hidden [&:checked+label]:bg-indigo-900 [&:checked+label]:text-white"
+          {% if cross_option.selected_value == value %}
+            checked
+          {% endif %}
+          data-idx="{{ forloop.index0 }}"
+          :checked="currentVariant?.options[{{ outerLoop }}].includes('{{value}}')"
+          data-x
+        >
+        <label
+          for="{{ section.id }}__{{ where }}cross-option--{{ cross_product.id }}-{{ cross_option.position | minus: 1 }}-{{ forloop.index0 }}"
+          @keyup.enter="$el.click()"
+          class="bg-slate-100 text-black !inline-flex items-center gap-2"
+        >
+          {% if cross_product.variants[forloop.index0].featured_image %}
+            <img
+              class="h-4 w-auto svg-active"
+              src="{{ cross_product.variants[forloop.index0].featured_image | image_url }}"
+              alt="{{ value | escape }} option image"
+              width="16"
+              height="16"
+              loading="eager"
+            >
+          {% endif %}
+          {{ value }}
+        </label>
+      {% endfor %}
+    </fieldset>
+  {% endfor %}
+</div>
+
+<style>
+  .section-main-product .product-customiser-wrapper fieldset {
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .section-main-product .product-customiser-wrapper fieldset legend {
+    font-size: 13px;
+    letter-spacing: 0.4px;
+    line-height: 19.5px;
+    color: rgba(26, 27, 24, 0.75);
+    margin-bottom: 16px;
+  }
+
+  .section-main-product .product-customiser-wrapper fieldset label {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 40px;
+    letter-spacing: 1px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  body:not(.using-mouse)
+    .section-main-product
+    .shopify-section-main-product-inner
+    .flex
+    .info
+    fieldset
+    input:focus
+    + label {
+    outline: #08f auto 2px;
+  }
+
+  .section-main-product .product-customiser-wrapper fieldset input[disabled] + label {
+    background-color: transparent;
+    color: lightgray;
+    cursor: default;
+  }
+</style>

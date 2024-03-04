@@ -66,7 +66,7 @@
       throw new Error('Default selected variant is unavailable.');
     }
 
-    const preselected = crossProductsStore.current[crossProduct.id];
+    const preselected = crossProductsStore.current[crossProduct.id]?.variant;
 
     return {
       selectedVariant: null,

@@ -206,7 +206,7 @@ class Prodify {
     return this.variantData
   }
   onOptionChange = (event) => {
-    if (event.target.dataset.x) {
+    if (event.target.hasAttribute('data-x')) {
       return
     }
 
