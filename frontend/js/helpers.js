@@ -39,6 +39,28 @@ export default {
       arr1.reduce((acc, currentValue, index) => acc && currentValue === arr2[index], true)
     )
   },
+  mutateArray(array, index, newValue) {
+    return array.map((value, i) => (i === index ? newValue : value))
+  },
+  logError(message) {
+    console.error(message)
+  },
+  throwError(message) {
+    throw new Error(message)
+  },
+  parseJson(el, attribute) {
+    const jsonEl = el.querySelector(attribute)
+    if (!jsonEl) {
+      showError(`JSON element with attribute ${attribute} not found`)
+      return null
+    }
+    try {
+      return JSON.parse(jsonEl.textContent)
+    } catch (error) {
+      this.logError(`Error parsing JSON: ${error}`)
+      return null
+    }
+  },
   async fetchHTML(endpoint) {
     return await fetch(endpoint)
       .then((response) => response.text())

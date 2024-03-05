@@ -206,7 +206,8 @@ class Prodify {
     return this.variantData
   }
   onOptionChange = (event) => {
-    if (event.target.hasAttribute('data-x')) {
+    // a temp flag to prevent prodify act on crosproducts
+    if (event.target.hasAttribute('data-idx')) {
       return
     }
 

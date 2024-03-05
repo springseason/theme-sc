@@ -2,79 +2,54 @@ export default {
   name: 'crossProductPicker',
   component(crossProductId, defaultOptions) {
     const crossProductStore = window.Alpine.store('crossProducts')
+    const helpers = window.sourcherry.helpers
+
     if (!crossProductStore) {
       throw new Error('Cross store not found.')
     }
-
+    if (!defaultOptions?.length || defaultOptions.length > 3 || typeof defaultOptions[0] !== 'string') {
+      console.error('Options not found or empty')
+      return
+    }
     return {
-      variants: null,
-      currentVariant: null,
-      currentOptions: null,
+      options: [],
       init() {
-        const variantEls = this.$el.querySelector('script[type="application/json"][data-xp-variants]')
-        if (!variantEls) {
-          console.error('Variant script element not found')
-          return
-        }
-
-        try {
-          const parsedVariants = JSON.parse(variantEls.textContent)
-          if (Array.isArray(parsedVariants) && parsedVariants.length > 0) {
-            this.variants = parsedVariants
-          } else {
-            console.error('Variants not found or empty')
-            this.variants = []
-          }
-        } catch (error) {
-          console.error('Error parsing variants JSON:', error)
-          return
-        }
-
-        const currentVariantStore = crossProductStore.current[crossProductId]?.variant
-        if (currentVariantStore) {
-          this.currentOptions = currentVariantStore?.options
-          this.currentVariant = currentVariantStore
+        const currentStoreOptions = crossProductStore.current[crossProductId]?.variant?.options
+        if (currentStoreOptions && currentStoreOptions.length < 3) {
+          this.options = currentStoreOptions
         } else {
-          if (!defaultOptions?.length) {
-            console.error('Options not found or empty')
-            return
-          }
-          this.currentOptions = defaultOptions
-          this.updateCurrentVariant()
+          this.options = defaultOptions
+          crossProductStore.registerCrossProduct(this.$el, crossProductId, defaultOptions)
         }
       },
       handleUserInput(ev) {
-        const idx = parseInt(this.$el.dataset.idx)
-        const value = this.$event.target.value
+        const idx = parseInt(ev.target.dataset.idx)
+        const value = ev.target.value
 
         if (!Number.isInteger(idx) || idx < 0 || idx > 2 || !value) {
-          console.error('Invalid index or value')
+          console.error('Invalid index or value', idx, value)
           return
         }
 
-        this.currentOptions[idx] = value
-        this.updateCurrentVariant()
+        this.options = helpers.mutateArray(this.options, idx, value)
+        crossProductStore.updateCrossProductVariant(crossProductId, this.options)
       },
-      updateCurrentVariant() {
-        if (!this.currentOptions?.length) {
-          console.error('Options not found or empty')
-          return
-        }
-        if (!this.variants || !this.variants.length) {
-          console.error('Variants not found or empty')
-          return
-        }
+      initWatcher() {
+        this.$watch('$store.crossProducts.current', (current) => {
+          const productVariantOptions = current[crossProductId]?.variant?.options
 
-        if (!crossProductId) {
-          console.error('id not found')
-        }
-
-        const selectedVariant = this.variants.find((variant) =>
-          variant.options.every((option) => this.currentOptions.includes(option))
-        )
-
-        this.currentVariant = selectedVariant || null
-        crossProductStore.updateCrossProduct(crossProductId, this.currentVariant)
+          if (productVariantOptions?.length && this.options?.length) {
+            // sync all the input instances with the currentVariant options
+            const eq = helpers.arraysAreEqual(productVariantOptions, this.options)
+            if (!eq) {
+              this.options = productVariantOptions
+            }
+            // on crossProducts reset
+          } else {
+            this.options = defaultOptions
+            crossProductStore.updateCrossProductVariant(crossProductId, defaultOptions)
+          }
+        })
       }
     }
   }

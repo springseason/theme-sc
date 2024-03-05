@@ -7,32 +7,16 @@
 
 <div
   x-data="crossProductPicker({{ cross_product.id }},{{ defaultSelectedOptions }})"
-  x-init="
-        $watch('$store.crossProducts.current', (current, old) => {
-    const currentVari = current['{{ cross_product.id }}']?.variant
-    const stateOptions = currentVari?.options
-
-    // other instance of the option has changed
-    if (stateOptions && currentVariant.options !== stateOptions) {
-
-      currentOptions = stateOptions
-      currentVariant = currentVari
-
-    // crossProducts resetted
-    } else if (!stateOptions) {
-      init()
-    }})
-  "
+  x-init="initWatcher"
 >
-  <script type="application/json" data-xp-variants>
-    {{- cross_product.variants | json -}}
+  <script type="application/json" data-crossproduct-id="{{ cross_product.id }}">
+    {{- cross_product | json -}}
   </script>
 
   {% for cross_option in cross_product.options_with_values %}
-    {% assign outerLoop = forloop.index0 %}
+    {% assign options_idx0 = forloop.index0 %}
     <fieldset
       x-on:change="handleUserInput"
-      data-idx="{{ outerLoop }}"
     >
       <legend>
         {{ cross_product.title }} - {{ cross_option.name }}
@@ -45,12 +29,11 @@
           name="cp-{{ cross_product.id}}-{{ cross_option.name }}"
           value="{{ value | escape }}"
           class="hidden [&:checked+label]:bg-indigo-900 [&:checked+label]:text-white"
+          data-idx="{{ options_idx0 }}"
           {% if cross_option.selected_value == value %}
             checked
           {% endif %}
-          data-idx="{{ forloop.index0 }}"
-          :checked="currentVariant?.options[{{ outerLoop }}].includes('{{value}}')"
-          data-x
+          :checked="options[{{ options_idx0 }}]==('{{value}}')"
         >
         <label
           for="{{ section.id }}__{{ where }}cross-option--{{ cross_product.id }}-{{ cross_option.position | minus: 1 }}-{{ forloop.index0 }}"

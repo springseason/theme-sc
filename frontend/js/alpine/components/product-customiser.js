@@ -3,10 +3,6 @@ export default {
   component() {
     return {
       step: 1,
-      reset() {
-        this.step = 1
-        window.Alpine.store('crossProducts')?.resetCurrent()
-      },
       prevStep() {
         if (this.step > 1) this.step -= 1
       },
@@ -15,6 +11,10 @@ export default {
       },
       completeForm() {
         this.step = 'complete'
+      },
+      reset() {
+        this.step = 1
+        window.Alpine.store('crossProducts')?.resetCrossProductVariant()
       }
     }
   }
