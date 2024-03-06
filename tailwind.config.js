@@ -4,20 +4,18 @@
  * docs: https://tailwindcss.com/docs/configuration
  * default: https://github.com/tailwindcss/tailwindcss/blob/master/stubs/defaultConfig.stub.js
  */
-const path = require('path')
-let plugin = require('tailwindcss/plugin')
+let plugin = require('tailwindcss/plugin');
 
 module.exports = {
+  mode: 'jit',
   content: [
     './layout/*.liquid',
     './sections/*.liquid',
     './snippets/*.liquid',
     './templates/*.liquid',
-    './frontend/**/*.{js,jsx,ts,tsx}'
+    './frontend/**/*.{js,jsx,ts,tsx}',
   ],
-  safelist: [
-    'skip-to-content-link'
-  ],
+  safelist: ['skip-to-content-link'],
   theme: {
     container: {
       center: true,
@@ -45,68 +43,34 @@ module.exports = {
       '2xl': '1536px',
       // => @media (min-width: 1536px) { ... }
     },
+    fontFamily: {
+      sans: 'var(--font-body-family)',
+      heading: 'var(--font-heading-family)',
+    },
     extend: {
-      fontFamily: {
-        'open-sans': ['"Open Sans"', 'sans-serif'],
-      },
-      typography: {
-        DEFAULT: {
-          css: {
-            maxWidth: 'none',
-            color: 'var(--color-neutral-400)',
-            iframe: {
-              width: '100%',
-              height: '100%',
-              aspectRatio: '16/9'
-            },
-            a: {
-              color: 'var(--color-secondary-500)',
-              '&:hover': {
-                color: 'var(--color-secondary-200)',
-              },
-            },
-          },
-        },
-      },
       colors: {
-        'cloud-burst': {
-          DEFAULT: '#252A59',
-          50: '#7179C4',
-          100: '#636CBE',
-          200: '#4953AF',
-          300: '#3D4593',
-          400: '#313876',
-          500: '#252A59',
-          600: '#151731',
-          700: '#04050A',
-          800: '#000000',
-          900: '#000000',
+        default: {
+          background: 'var(--default-bg)',
+          'background-gradient': 'var(--default-gradient)',
+          text: 'var(--default-text)',
+          button: 'var(--default-button)',
+          'button-label': 'var(--default-button-label)',
+          'secondary-button-label': 'var(--default-sec-button-label)',
+          shadow: 'var(--default-shadow)',
+          hover: 'var(--default-hover)',
         },
-        woodland: {
-          DEFAULT: '#595425',
-          50: '#C4BC71',
-          100: '#BEB563',
-          200: '#AFA649',
-          300: '#938A3D',
-          400: '#766F31',
-          500: '#595425',
-          600: '#312F15',
-          700: '#0A0904',
-          800: '#000000',
-          900: '#000000',
-          950: '#000000',
-        }
-      }
+      },
     },
   },
   plugins: [
     require('@tailwindcss/container-queries'),
     require('@tailwindcss/typography')({
-      className: 'rte'
+      className: 'rte',
     }),
+    require('@tailwindcss/forms'),
     plugin(function ({ addVariant }) {
       addVariant('scrolled', '.scrolled &'),
-        addVariant('mobile-menu-visible', '.mobile-menu-visible &')
+        addVariant('mobile-menu-visible', '.mobile-menu-visible &');
     }),
   ],
-}
+};

@@ -1,0 +1,10 @@
+{
+  "css.customData": [
+    ".vscode/tailwind.json"
+  ],
+  "prettier.semi": false,
+  "editor.formatOnSave": false,
+  "notebook.formatOnSave.enabled": false,
+  "files.autoSaveWhenNoErrors": false,
+  "files.autoSaveWorkspaceFilesOnly": false
+}

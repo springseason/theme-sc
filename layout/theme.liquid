@@ -1,23 +1,30 @@
 <!doctype html>
-<html lang="{{ request.locale.iso_code }}" class="no-js font-open-sans">
+<html lang="{{ request.locale.iso_code }}" class="no-js">
   <head>
     {% render 'head-meta' %}
 
-    <link rel="icon" href="{{ 'favicon.ico' | asset_url }}">
     <link rel="canonical" href="{{ canonical_url }}">
+
+    {%- if settings.favicon != blank -%}
+      <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
+    {%- endif -%}
     <link
       rel="preconnect"
       href="https://cdn.shopify.com"
-      crossorigin>
+      crossorigin
+    >
 
     <title>
       {{ page_title }}
       {%- if current_tags %}
-        &ndash; tagged "{{ current_tags | join: ', ' }}"{%- endif -%}
+        &ndash; tagged "{{ current_tags | join: ', ' }}"
+      {%- endif -%}
       {%- if current_page != 1 %}
-        &ndash; Page {{ current_page -}}{%- endif -%}
+        &ndash; Page {{ current_page -}}
+      {%- endif -%}
       {%- unless page_title contains shop.name %}
-        &ndash; {{ shop.name -}}{%- endunless -%}
+        &ndash; {{ shop.name -}}
+      {%- endunless -%}
     </title>
 
     <!-- header hook for Shopify plugins -->
@@ -29,8 +36,8 @@
     {% liquid
       render 'vite' with 'theme.css'
       render 'vite' with 'theme.js'
-    %} 
-  </head> 
+    %}
+  </head>
 
   {% liquid
     assign bodyClasses = template | handleize | append: '-template'
@@ -46,18 +53,16 @@
     :class="$store.global.bodyClasses"
     x-data
     x-scrolled
-    >
-
-    <a class="skip-to-content-link" href="#main-content">
-      Skip to content
-    </a>
+  >
+    <a class="skip-to-content-link" href="#main-content"> Skip to content </a>
 
     {% section 'header' %}
 
     <main
       id="main-content"
       role="main"
-      class="site-main-tw-component relative">
+      class="site-main-tw-component relative"
+    >
       {{ content_for_layout }}
     </main>
 
@@ -78,7 +83,8 @@
       x-cloak
       :aria-hidden="$store.global.isMinicartVisible ? 'false' : 'true'"
       aria-modal="true"
-      role="dialog">
+      role="dialog"
+    >
       {% section 'minicart' %}
     </div>
 

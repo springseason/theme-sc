@@ -1,5 +1,10 @@
-<div id="site-promo-bar-wrapper" 
-  {% if settings.collapse_promo_bar %}
+{% comment %}
+  collapse_enabled
+  colors.
+{% endcomment %}
+<div
+  id="site-promo-bar-wrapper"
+  {% if collapse_enabled %}
     x-data
     x-show="!$store.global.isWindowScrolled"
     x-collapse
@@ -9,8 +14,15 @@
     id="site-promo-bar"
     class="site-promo-bar-tw-component"
   >
-    <div class="text-white [&_a]:text-white font-bold text-base tracking-wide text-center">
-      {{ settings.promo_bar_content }}
+    <div class="font-bold text-base tracking-wide text-center">
+      {{ content }}
     </div>
   </div>
 </div>
+
+<style>
+  .site-promo-bar-tw-component {
+    background-color: {{ colors.background }};
+    color: {{ colors.text }}
+  }
+</style>

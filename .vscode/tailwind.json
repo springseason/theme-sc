@@ -1,0 +1,9 @@
+{
+  "version": 1.1,
+  "atDirectives": [
+    {
+      "name": "@apply",
+      "description": "https://tailwindcss.com/docs/reusing-styles#extracting-classes-with-apply"
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{% comment %}
+  Renders cross product option picker for a cross product
+
+  Accepts:
+  - cross_products: [{Object}] cross product array of object.
+
+  Usage:
+  {% render 'cross-product-picker',
+    cross_products: cross_products,
+  %}
+{% endcomment %}
+
+{%- unless cross_products.empty? -%}
+  {% for cross_product in cross_products %}
+    <div
+      class="w-full border-b my-2"
+      data-prodify-cross-option-container
+      data-prodify-cross-product-id="{{ cross_product.id }}"
+    >
+      <script
+        type="application/json"
+        data-prodify-cross-product-id="{{ cross_product.id }}"
+        data-prodify-cross-product
+      >
+        {{- cross_product | json -}}
+      </script>
+
+      {% for ruleset in product.metafields.custom.availability_rules.value %}
+        {% if cross_product.tags contains ruleset.tag %}
+          {% assign cross_product_ruleset = ruleset %}
+          {% break %}
+        {% else %}
+          {% assign cross_product_ruleset = null %}
+        {% endif %}
+      {% endfor %}
+
+      {% unless cross_product_ruleset == null %}
+        {% assign ruleset_json = '[' %}
+        {% for rule in cross_product_ruleset.items.value %}
+          {% assign main_variant_ids = rule.main_variants.value | map: 'id' | join: ',' %}
+          {% assign main_variant_ids_string = '[' | append: main_variant_ids | append: ']' %}
+          {% assign available_cross_product_options_string = rule.option_variants.value
+            | map: 'options'
+            | join: '","'
+            | prepend: '["'
+            | append: '"]'
+          %}
+          {% assign rule_json = '['
+            | append: main_variant_ids_string
+            | append: ','
+            | append: available_cross_product_options_string
+            | append: ']'
+          %}
+          {% assign ruleset_json = ruleset_json | append: rule_json %}
+          {% unless forloop.last %}
+            {% assign ruleset_json = ruleset_json | append: ',' %}
+          {% endunless %}
+        {% endfor %}
+        {% assign ruleset_json = ruleset_json | append: ']' %}
+
+        <script
+          type="application/json"
+          data-prodify-cross-product-id="{{ cross_product.id }}"
+          data-prodify-cross-product-availability="{{ cross_product.title }}"
+        >
+          {{- ruleset_json -}}
+        </script>
+      {% endunless %}
+
+      {% for cross_option in cross_product.options_with_values %}
+        <fieldset>
+          <legend>
+            {{ cross_product.title }} -
+            {{ cross_option.name }}
+            {% unless cross_product_ruleset == null %}
+              <span class="text-red-800 opacity-70 text-lg">⊙</span>
+            {% endunless %}
+          </legend>
+          {% render 'cross-product-options',
+            cross_product: cross_product,
+            option: cross_option,
+            picker_type: 'radio',
+            ruleset: cross_product_ruleset
+          %}
+        </fieldset>
+      {% endfor %}
+    </div>
+  {% endfor %}
+{%- endunless %}

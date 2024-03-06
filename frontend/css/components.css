@@ -1,6 +1,6 @@
 @layer components {
   .skip-to-content-link {
-    @apply absolute z-50 px-4 py-2 text-white bg-cloud-burst rounded-lg shadow-lg;
+    @apply absolute z-50 px-4 py-2 text-white bg-default-background rounded-lg shadow-lg;
   }
 
   .skip-to-content-link:not(:focus) {
@@ -10,24 +10,57 @@
     padding: 0;
     margin: -1px;
     overflow: hidden;
-    clip: rect(0,0,0,0);
+    clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border-width: 0;
   }
 
   .btn {
-    @apply py-3 px-12 bg-indigo-900 hover:bg-cloud-burst-600 text-white rounded-full transition;
-  } 
+    @apply py-3 px-12 bg-indigo-900 hover:bg-default-background text-white rounded-full transition disabled:bg-gray-600;
+  }
 
   .pill-button {
     @apply bg-indigo-900 text-white px-4 rounded-lg cursor-pointer;
   }
 
-  .slayed-input {
+  .my-input {
     @apply py-2 px-4 border border-gray-500 rounded-lg;
   }
 
   .site-promo-bar-tw-component {
-    @apply flex px-4 py-1 top-0 w-full items-center justify-center bg-woodland-500 text-white;
+    @apply flex px-4 py-1 top-0 w-full items-center justify-center;
+  }
+
+  .header-nav {
+    @apply flex items-center px-2 cursor-pointer h-16;
+  }
+
+  .loading-dots:after {
+    @apply text-xl leading-none -ml-1;
+    content: '  .';
+    animation: dots 1.2s steps(5, end) infinite;
+  }
+
+  @keyframes dots {
+
+    0%,
+    20% {
+      color: rgba(0, 0, 0, 0);
+      text-shadow: 0.25em 0 0 rgba(0, 0, 0, 0), 0.5em 0 0 rgba(0, 0, 0, 0);
+    }
+
+    40% {
+      color: white;
+      text-shadow: 0.25em 0 0 rgba(0, 0, 0, 0), 0.5em 0 0 rgba(0, 0, 0, 0);
+    }
+
+    60% {
+      text-shadow: 0.25em 0 0 white, 0.5em 0 0 rgba(0, 0, 0, 0);
+    }
+
+    80%,
+    100% {
+      text-shadow: 0.25em 0 0 white, 0.5em 0 0 white;
+    }
   }
 }

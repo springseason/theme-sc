@@ -1,174 +1,260 @@
 {% schema %}
-  {
-    "name": "header",
-    "class": "section-header sticky top-0 z-20 shadow-md",
-    "tag": "header",
-    "settings": []
-  }
+{
+  "name": "Header",
+  "class": "section-header sticky top-0 z-20 shadow-md",
+  "tag": "header",
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "t:sections.header.settings.links.header.label",
+      "default": "main-menu"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.header.settings.colors.nav.label",
+      "default": "default-palette"
+    },
+    {
+      "type": "color_scheme",
+      "id": "menu_color_scheme",
+      "label": "t:sections.header.settings.colors.menu.label",
+      "default": "default-palette"
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Promo bar",
+      "type": "promo-bar",
+      "settings": [
+        {
+          "type": "text",
+          "id": "promo_bar_content",
+          "label": "Promo bar content",
+          "default": "Diszko"
+        },
+        {
+          "type": "checkbox",
+          "id": "collapse_promo_bar",
+          "label": "Enable promo bar to collapse",
+          "default": true
+        },
+        {
+          "type": "color_scheme",
+          "id": "promo_color_scheme",
+          "label": "t:sections.header.blocks.promo.label",
+          "default": "default-palette"
+        }
+      ],
+      "limit": 1
+    },
+    {
+      "name": "Search",
+      "type": "search",
+      "settings": [],
+      "limit": 1
+    },
+    {
+      "name": "User",
+      "type": "user",
+      "settings": [],
+      "limit": 1
+    },
+    {
+      "name": "Cart",
+      "type": "cart",
+      "settings": [
+        {
+          "type": "select",
+          "id": "select_cart_type",
+          "label": "Select cart type",
+          "default": "mini-cart",
+          "options": [
+            {
+              "value": "mini-cart",
+              "label": "Mini cart"
+            },
+            {
+              "value": "cart",
+              "label": "Full page cart"
+            }
+          ]
+        }
+      ],
+      "limit": 1
+    }
+  ]
+}
 {% endschema %}
 
-{% if settings.show_promo_bar %}
-  {% render 'promo-bar' %}
-{% endif %}
+{% for block in section.blocks %}
+  {% if block.type == 'promo-bar' %}
+    {%
+      render 'promo-bar',
+      content: block.settings.promo_bar_content,
+      collapse_enabled: block.settings.collapse_promo_bar,
+      colors: block.settings.promo_color_scheme.settings,
+    %}
+  {% endif %}
+{% endfor %}
 
-<div class="px-6 md:px-8 bg-indigo-900">
-  <div class="container flex items-center text-white relative mx-auto">
-    <nav
-      :class="$store.global.isMobileMenuVisible ? 'open' : 'closed'"
-      aria-label="Mobile Navigation Overlay"
-      class="block md:hidden"
-      style="transition: all 300ms;"
-      id="mobile-nav"
-      role="navigation"
-      x-cloak
-      x-data>
-      <button
-        id="mobile-nav-trigger"
-        type="button"
-        @click="$store.global.toggleMobileMenu()"
-        :aria-expanded="$store.global.isMobileMenuVisible"
-        aria-label="Mobile Navigation Button"
-        aria-controls="mobile-menu-list"
+<div class="px-6 md:px-8">
+  <div class="container flex items-center relative mx-auto max-h-16">
+    {% comment %}
+      <nav
+        :class="$store.global.isMobileMenuVisible ? 'open' : 'closed'"
+        aria-label="Mobile Navigation Overlay"
+        class="block md:hidden"
+        style="transition: all 300ms;"
+        id="mobile-nav"
+        role="navigation"
+        x-cloak
         x-data>
-        <span class="sr-only">Menu</span>
-        <span aria-hidden="true" x-show="!$store.global.isMobileMenuVisible">
-          {% render 'icon-hamburger' %}
-        </span>
-        <span aria-hidden="true" x-show="$store.global.isMobileMenuVisible">
-          {% render 'icon-close-x' %}
-        </span>
-      </button>
-      {% render 'mobile-menu' %}
+        <button
+          id="mobile-nav-trigger"
+          type="button"
+          @click="$store.global.toggleMobileMenu()"
+          :aria-expanded="$store.global.isMobileMenuVisible"
+          aria-label="Mobile Navigation Button"
+          aria-controls="mobile-menu-list"
+          x-data>
+          <span class="sr-only">Menu</span>
+          <span aria-hidden="true" x-show="!$store.global.isMobileMenuVisible">
+            {% render 'icon-hamburger' %}
+          </span>
+          <span aria-hidden="true" x-show="$store.global.isMobileMenuVisible">
+            {% render 'icon-close-x' %}
+          </span>
+        </button>
+        {% render 'mobile-menu' %}
+      </nav>
+    {% endcomment %}
+
+    {%- if shop.brand.logo != blank -%}
+      <a href="{{ routes.root_url }}" class="p-2">
+        <span class="sr-only"></span>
+        <img
+          class="h-10 w-auto"
+          src="{{ shop.brand.logo | image_url }}"
+          alt="{{ shop.name | escape }}'s logo"
+          width="40"
+          height="40"
+          loading="eager"
+        >
+      </a>
+    {%- else -%}
+      <a href="{{ routes.root_url }}" class="header-logo">Cherry</a>
+    {%- endif -%}
+
+    <nav class="hidden md:block">
+      {% render 'header-menu',
+        links: section.settings.menu.links,
+        colors: section.settings.color_scheme.settings,
+        menu_colors: section.settings.menu_color_scheme.settings
+      %}
     </nav>
 
-    <a href="{{ routes.root_url }}" class="header-logo">
-      Slayed
-    </a>
-
-    <div class="hidden md:block">
-      {% render 'header-menu' %}
-    </div>
-
-    <div class="flex items-center space-x-3 self-center ml-auto">
-      {% if settings.enable_predictive_search %}
-        <a href="{{ routes.search_url }}" class="block md:hidden text-white fill-white p-2 [&>svg]:h-[28px]">
-          {% render 'icon-search' %}
-        </a>
-        <button
-          type="button"
-          class="text-white fill-white p-2 [&>svg]:h-[28px] hidden md:block"
-          @click="$store.global.isPredictiveSearchVisible = true"
-          :aria-expanded="$store.global.isPredictiveSearchVisible ? 'true' : 'false'">
-          {% render 'icon-search' %}
-        </button>
-      {% else %}
-        <a href="{{ routes.search_url }}" class="text-white fill-white p-2 [&>svg]:h-[28px]">
-          {% render 'icon-search' %}
-        </a>
-      {% endif %}
-
-      {% if shop.customer_accounts_enabled %}
-        <a href="{{ routes.account_url }}" class="text-white fill-white p-2 [&>svg]:h-[28px]">
-          {% render 'icon-user' %}
-        </a>
-      {% endif %}
-
-      <a
-        href="{{ routes.cart_url }}"
-        class="[&>svg]:h-[22px] [&>svg]:w-auto relative text-white p-2"
-        x-cloak>
-        {% render 'icon-cart' %}
-        <span data-ajax-cart-bind="item_count" class="text-cloud-burst-500 absolute top-[58%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-[12px]">
-          {{- cart.item_count -}}
-        </span>
-      </a>
-    </div>
-
-    {% comment %}
-    // Output customer login links
-
-    <ul>
-    {% if shop.customer_accounts_enabled %}
-    {% if customer %}
-    <a href="{{ routes.account_url }}">
-    {{ 'action.account' | t }}
-    </a>
-    {{ 'action.log_out' | t | customer_logout_link }}
-    {% else %}
-    {{ 'action.log_in' | t | customer_login_link }}
-    {{ 'action.register' | t | customer_register_link }}
-    {% endif %}
-    {% endif %}
+    <ul class="settings-menu flex items-center self-center ml-auto gap-4 xl:gap-6">
+      {%- render 'header-settings-menu' -%}
     </ul>
-    {% endcomment %}</div>
+  </div>
+</div>
 
-  <style>
+{% comment %}
+  // Output customer login links
+
+  <ul>
+  {% if shop.customer_accounts_enabled %}
+  {% if customer %}
+  <a href="{{ routes.account_url }}">
+  {{ 'action.account' | t }}
+  </a>
+  {{ 'action.log_out' | t | customer_logout_link }}
+  {% else %}
+  {{ 'action.log_in' | t | customer_login_link }}
+  {{ 'action.register' | t | customer_register_link }}
+  {% endif %}
+  {% endif %}
+  </ul>
+{% endcomment %}
+
+<style>
+  header {
+    background-color: {{ section.settings.color_scheme.settings.background }};
+  }
+  .header-nav {
+    color: {{ section.settings.color_scheme.settings.text }};
+  }
+  .header-nav:hover {
+    color: {{ section.settings.color_scheme.settings.hover }};
+  }
+
+  .section-header .header-logo {
+    color: white;
+    text-decoration: none;
+    font-size: 32px;
+    text-transform: uppercase;
+  }
+
+  #mobile-nav-trigger {
+    display: none;
+    -webkit-appearance: none;
+    appearance: none;
+    -moz-appearance: none;
+    background: transparent;
+    border: 0;
+  }
+
+  #mobile-nav-trigger svg {
+    fill: white;
+    width: 26px;
+    height: auto;
+  }
+
+  @media (max-width: 768px) {
     .section-header .header-logo {
-      color: white;
-      text-decoration: none;
-      font-size: 32px;
-      text-transform: uppercase;
-    }
-
-    #mobile-nav-trigger {
-      display: none;
-      -webkit-appearance: none;
-      appearance: none;
-      -moz-appearance: none;
-      background: transparent;
-      border: 0;
-    }
-
-    #mobile-nav-trigger svg {
-      fill: white;
-      width: 26px;
-      height: auto;
-    }
-
-    @media(max-width: 768px) {
-      .section-header .header-logo {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-      }
-
-      #mobile-nav-trigger {
-        display: block;
-      }
-    }
-
-    .cart-icon-wrapper {
-      text-decoration: none;
-      color: white;
-      margin-left: auto;
-      position: relative;
-    }
-
-    .cart-icon-wrapper span {
       position: absolute;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -35%);
-      z-index: 5;
-      font-size: 12px;
-      font-weight: bold;
+      transform: translate(-50%, -50%);
     }
 
-    .bi-bag {
-      display: none;
-    }
-
-    .js-ajax-cart-not-empty .header .bi-bag-fill {
+    #mobile-nav-trigger {
       display: block;
     }
+  }
 
-    .js-ajax-cart-empty .header .bi-bag-empty {
-      display: block;
-    }
+  .cart-icon-wrapper {
+    text-decoration: none;
+    color: white;
+    margin-left: auto;
+    position: relative;
+  }
 
-    .js-ajax-cart-empty .header .bi-bag-fill {
-      display: none;
-    }
-  </style>
-</div>
+  .cart-icon-wrapper span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -35%);
+    z-index: 5;
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  .bi-bag {
+    display: none;
+  }
+
+  .js-ajax-cart-not-empty .header .bi-bag-fill {
+    display: block;
+  }
+
+  .js-ajax-cart-empty .header .bi-bag-empty {
+    display: block;
+  }
+
+  .js-ajax-cart-empty .header .bi-bag-fill {
+    display: none;
+  }
+</style>

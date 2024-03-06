@@ -6,4 +6,12 @@
   .pin-x {
     @apply inset-x-0;
   }
+
+  .base-fade {
+    @apply transition-colors duration-300 ease-out
+  }
+
+  .svg-active {
+    filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(207deg) brightness(103%) contrast(102%);
+  }
 }

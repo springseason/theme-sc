@@ -6,13 +6,20 @@
   h1 {
     @apply text-5xl font-bold;
   }
+
   h2 {
     @apply text-4xl font-bold;
   }
+
   h3 {
     @apply text-2xl font-bold;
   }
-  a {
-    @apply text-cloud-burst-500 font-bold;
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    @apply font-heading
   }
 }

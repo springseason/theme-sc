@@ -1,0 +1,74 @@
+{% for cross_product in cross_products %}
+  {% assign default_selected_variant_json = cross_product.selected_or_first_available_variant | json | escape %}
+  {% assign cross_product_json = cross_product | json | escape %}
+  <div x-data="handleVariantSelect({{- cross_product_json -}},{{- default_selected_variant_json -}})">
+    <span x-text="selectedVariant"></span>
+    {% for cross_option in cross_product.options_with_values %}
+      <fieldset>
+        <legend>{{ cross_product.title }} - {{ cross_option.name }}</legend>
+        {% for value in cross_option.values %}
+          <input
+            type="radio"
+            x-model="selectedOptions[{{ cross_option.position | minus: 1 }}]"
+            x-on:change="onOptionChange"
+            id="{{ section.id }}__cross-option--{{ cross_product.id }}-{{ cross_option.position | minus: 1 }}-{{ forloop.index0 }}"
+            name="cp-{{ cross_product.id}}-{{ cross_option.name }}"
+            value="{{ value | escape }}"
+            class="hidden [&:checked+label]:bg-indigo-900 [&:checked+label]:text-white"
+            {% if cross_option.selected_value == value %}
+              checked
+            {% endif %}
+            data-x="x"
+          >
+          <label
+            for="{{ section.id }}__cross-option--{{ cross_product.id }}-{{ cross_option.position | minus: 1 }}-{{ forloop.index0 }}"
+            @keyup.enter="$el.click()"
+            class="bg-slate-100 text-black !inline-flex items-center gap-2"
+          >
+            {% if cross_product.variants[forloop.index0].featured_image %}
+              <img
+                class="h-4 w-auto svg-active"
+                src="{{ cross_product.variants[forloop.index0].featured_image | image_url }}"
+                alt="{{ value | escape }} option image"
+                width="16"
+                height="16"
+                loading="eager"
+              >
+            {% endif %}
+            {{ value }}
+          </label>
+        {% endfor %}
+      </fieldset>
+    {% endfor %}
+  </div>
+{% endfor %}
+
+<script>
+  function handleVariantSelect(crossProduct, defaultSelectedVariant) {
+    return {
+      selectedVariant: null,
+      selectedOptions: [],
+      init() {
+        if (!defaultSelectedVariant?.id || !defaultSelectedVariant?.options?.length) {
+          console.error('invalid init data');
+        }
+        this.selectedVariant = defaultSelectedVariant.id;
+        this.selectedOptions = defaultSelectedVariant.options;
+      },
+      onOptionChange() {
+        if (!crossProduct?.variants?.length || !this.selectedOptions?.length) {
+          console.error('cross variants not found');
+        }
+        const selectedVariant = crossProduct.variants.find((cpVariant) => {
+          const variantOptions = cpVariant.options;
+          return variantOptions.every((option, index) => option === this.selectedOptions[index]);
+        });
+        if (!selectedVariant.id) {
+          console.error('variant id not found');
+          return;
+        }
+        this.selectedVariant = selectedVariant.id;
+      },
+    };
+  }
+</script>
