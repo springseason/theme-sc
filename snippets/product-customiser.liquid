@@ -19,6 +19,18 @@
     x-data="customiser"
     class="h-full flex flex-col relative"
   >
+    <div x-show.transition="step === 0">
+      <div x-data="$store.crossProducts.current">
+        <h3>Init</h3>
+        {% render 'product-variant-picker',
+          product: product,
+          product_form_id: 'product-form-id',
+          picker_type: section.settings.picker_type,
+          where: 'customiser'
+        %}
+      </div>
+    </div>
+
     {% for cross_product in steps %}
       {% assign steps_count = forloop.index %}
       <div
@@ -75,7 +87,7 @@
         </button>
         <button
           x-cloak
-          :disabled="step < 2"
+          :disabled="step < 1"
           @click="prevStep"
           type="button"
           class="underline disabled:text-gray-300"

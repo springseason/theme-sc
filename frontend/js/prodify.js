@@ -12,9 +12,17 @@ class Prodify {
       console.error('Prodify element not found.')
       return
     }
+
+    this.customiserEl = document.querySelector('.product-customiser-wrapper')
+    if (!this.customiserEl) {
+      console.info('Product customiser not found')
+    }
+
     this.pickerType = this.el.dataset.prodify
     this.currentVariant = null
     this.variantData = null
+    this.options = null
+    this.optionContainers = null
 
     this.selectors = {
       priceContainer: '[data-prodify-price-container]',
@@ -44,6 +52,8 @@ class Prodify {
 
   bindEventListeners() {
     this.el.addEventListener('change', this.onOptionChange)
+    this?.customiserEl?.addEventListener('change', this.onOptionChange)
+
     if (this.quantityIncrementButton && this.quantityDecrementButton && this.quantityPresentationInput) {
       this.quantityIncrementButton.addEventListener('click', () => this.updateQuantity('up'))
       this.quantityDecrementButton.addEventListener('click', () => this.updateQuantity('down'))
@@ -65,16 +75,40 @@ class Prodify {
     })
     this.currentVariant = matchingVariant
   }
-  updateCurrentOptions() {
-    if (this.pickerType == 'select') {
-      this.options = Array.from(this.el.querySelectorAll('select'), (select) => select.value)
+  updateCurrentOptions(target) {
+    const isFromCustomiser = target?.id.includes('customiser')
+    const mainEl = isFromCustomiser ? this.customiserEl : this.el
+    const optionContainers = Array.from(mainEl.querySelectorAll(this.selectors.optionContainer))
+
+    if (this.pickerType === 'select') {
+      this.options = Array.from(mainEl.querySelectorAll('select'), (select) => select.value)
       return
     }
-    this.optionContainers = Array.from(this.el.querySelectorAll(this.selectors.optionContainer))
-    this.options = this.optionContainers.map((optionContainer) => {
-      return Array.from(optionContainer.querySelectorAll('input')).find((radio) => radio.checked).value
+
+    this.options = optionContainers.map((optionContainer) => {
+      const checkedInput = Array.from(optionContainer.querySelectorAll('input')).find((radio) => radio.checked)
+      if (!checkedInput) {
+        console.error('Updating product variant options failed, missing checked input.')
+        return null
+      }
+      return checkedInput.value
     })
+
+    // Sync other inputs
+    if (this.customiserEl) {
+      const targetMainEl = isFromCustomiser ? this.el : this.customiserEl
+      const optionContainerEls = Array.from(targetMainEl.querySelectorAll(this.selectors.optionContainer))
+      for (const [idx, optionContainer] of optionContainerEls.entries()) {
+        const targetInputEl = optionContainer.querySelector(`input[value="${this.options[idx]}"]`)
+        if (!targetInputEl) {
+          console.error('Product variant option sync failed, missing input.')
+          return
+        }
+        targetInputEl.checked = true
+      }
+    }
   }
+
   updateVariantIdInput() {
     const productForms = document.querySelectorAll(this.selectors.productForm)
     productForms.forEach((productForm) => {
@@ -124,21 +158,24 @@ class Prodify {
       })
     }
   }
-  compareInputValues() {
+  compareInputValues(target) {
+    const isFromCustomiser = target?.id.includes('customiser')
+    const el = isFromCustomiser ? this.customiserEl : this.el
+
     const variantsMatchingOptionOneSelected = this.variantData.filter(
       // Grab the first checked input and compare it to the variant option1
       // return an array of variants where the option1 matches the checked input
-      (variant) => this.el.querySelector(':checked').value === variant.option1
+      (variant) => el.querySelector(':checked').value === variant.option1
     )
 
-    const inputWrappers = [...this.el.querySelectorAll(this.selectors.optionContainer)]
+    const inputWrappers = [...el.querySelectorAll(this.selectors.optionContainer)]
     inputWrappers.forEach((option, index) => {
       if (index === 0) return
       const optionInputs = [...option.querySelectorAll('input[type="radio"], option')]
-      const previousOptionSelected = inputWrappers[index - 1].querySelector(':checked').value
+      const previousOptionSelected = inputWrappers[index - 1].querySelector(':checked')?.value
       const availableOptionInputsValues = variantsMatchingOptionOneSelected
-        .filter((variant) => variant.available && variant[`option${index}`] === previousOptionSelected)
-        .map((variantOption) => variantOption[`option${index + 1}`])
+        ?.filter((variant) => variant.available && variant[`option${index}`] === previousOptionSelected)
+        ?.map((variantOption) => variantOption[`option${index + 1}`])
 
       const existingOptionInputsValues = variantsMatchingOptionOneSelected
         .filter((variant) => variant[`option${index}`] === previousOptionSelected)
@@ -211,10 +248,10 @@ class Prodify {
       return
     }
 
-    this.updateCurrentOptions()
+    this.updateCurrentOptions(event.target)
     this.updateCurrentVariant()
     this.updateAddButtonDom(true, '', false)
-    this.compareInputValues()
+    this.compareInputValues(event.target)
     this.setOptionSelected(event.target)
 
     if (!this.currentVariant) {
@@ -225,6 +262,34 @@ class Prodify {
       this.swapProductInfo()
     }
   }
+  // FOR DEBUG
+  // set currentVariant(variant) {
+  //   if (this._currentVariant !== variant) {
+  //     this._currentVariant = variant
+  //     this.notifyChange('currentVariant', variant)
+  //   }
+  // }
+
+  // get currentVariant() {
+  //   return this._currentVariant
+  // }
+
+  // set options(options) {
+  //   if (this._options !== options) {
+  //     this._options = options
+  //     this.notifyChange('options', options)
+  //   }
+  // }
+
+  // get options() {
+  //   return this._options
+  // }
+
+  // notifyChange(property, value) {
+  //   if (property == 'options') {
+  //     console.log(`${property} changed:`, value)
+  //   }
+  // }
 }
 
 window.prodify = new Prodify()

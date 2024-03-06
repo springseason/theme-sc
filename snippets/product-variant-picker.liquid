@@ -13,11 +13,18 @@
   {% if picker_type == 'radio' %}
     <div class="variant-radios">
       {% for option in product.options_with_values %}
-        <fieldset data-prodify-option-container>
+        <fieldset
+          data-prodify-option-container
+        >
           <legend>
             {{ option.name }}
           </legend>
-          {% render 'product-variant-options', product: product, option: option, picker_type: picker_type %}
+          {% render 'product-variant-options',
+            product: product,
+            option: option,
+            picker_type: picker_type,
+            where: where
+          %}
         </fieldset>
       {% endfor %}
     </div>

@@ -20,8 +20,9 @@
   assign variants_option3_arr = product.variants | map: 'option3'
 
   assign product_form_id = 'product-form-' | append: section.id
--%}
 
+  assign where = where | default: 'default'
+-%}
 {%- for value in option.values -%}
   {%- liquid
     assign option_not_exist = true
@@ -60,11 +61,10 @@
   {%- if picker_type == 'radio' -%}
     <input
       type="radio"
-      id="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
-      name="{{ option.name }}"
+      id="{{ section.id }}-{% unless where == 'default' %}{{ where }}-{% endunless %}{{ option.position }}-{{ forloop.index0 }}"
+      name="{{ option.name }}{% unless where == 'default' %}-{{ where }}{% endunless %}"
       value="{{ value | escape }}"
       form="{{ product_form_id }}"
-      data-prodify-variant-radio
       {% if option.selected_value == value %}
         checked
       {% endif %}
@@ -77,12 +77,12 @@
       {% endif %}
     >
     <label
-      for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
+      for="{{ section.id }}-{% unless where == 'default' %}{{ where }}-{% endunless %}{{ option.position }}-{{ forloop.index0 }}"
       @keyup.enter="$el.click()"
       class="bg-slate-100 text-black"
     >
       {{ value -}}
-      <span class="visually-hidden sr-only">{{ 'products.product.variant_sold_out_or_unavailable' | t }}</span>
+      {% comment %} <span class="visually-hidden sr-only">{{ 'products.product.variant_sold_out_or_unavailable' | t }}</span> {% endcomment %}
     </label>
   {%- else -%}
     <option
