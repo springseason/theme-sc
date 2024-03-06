@@ -1,0 +1,10 @@
+frontend/
+modules/
+static/
+package.json
+package-lock.json
+vite.config.ts
+README.md
+jsconfig.json
+tsconfig.json
+postcss.config.cjs

@@ -1,46 +1,69 @@
-<!-- logo (start) -->
-<p align="center">
-  <img src="https://raw.githubusercontent.com/uicrooks/shopify-theme-lab/master/.github/img/logo.svg" width="250px">
-</p>
+# Slayed Shopify Starter Theme
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/uicrooks/shopify-theme-lab/master/.github/img/banner.svg" width="400px">
-</p>
-<!-- logo (end) -->
+## Shopify CLI
 
-<!-- badges (start) -->
-<p align="center">
-  <img src="https://img.shields.io/github/package-json/v/uicrooks/shopify-theme-lab?color=%236e78ff">
-  <img src="https://img.shields.io/github/package-json/dependency-version/uicrooks/shopify-theme-lab/vue?color=%234fc08d">
-  <img src="https://img.shields.io/github/package-json/dependency-version/uicrooks/shopify-theme-lab/tailwindcss?color=%2306b6d4">
-</p>
-<!-- badges (end) -->
+To easily log into your preferred store and theme, create a `shopify.theme.toml` in the root directory and define your environement details.
 
-<!-- title / description (start) -->
-<h2 align="center">Shopify Theme Lab</h2>
+Example:
 
-Shopify Theme Lab is a customizable modular development environment for blazing-fast Shopify theme creation. It is built on top of the [Shopify CLI](https://shopify.dev/themes/tools/cli) and extends it with additional workflow and building capabilities. By default, it's bundled with Vue.js and Tailwind CSS, but you can swap them for pretty much anything. Build a custom Shopify theme from scratch with a modern stack!
+```toml
+[environments.development]
+store = "slayed-starter"
+theme = "123123123"
 
-> If you are looking for the old Theme Lab it's here: [Legacy Version 3 branch](https://github.com/uicrooks/shopify-theme-lab/tree/legacy-v3)
-<!-- title / description (end) -->
+[environments.staging]
+store = "slayed-starter"
+theme = "123123123"
+ignore = ["templates/*", "config/*"]
 
-<!-- docs (start) -->
-## Docs
+[environments.production]
+store = "slayed-starter"
+theme = "123123123"
+ignore = ["templates/*", "config/*"]
+```
 
-👉 You can find the documentation [here](https://uicrooks.github.io/shopify-theme-lab-docs)
-<!-- docs (end) -->
+### Commands
 
-<!-- ecosystem (start) -->
-## Ecosystem
-| Project | Status | Description |
-| - | - | - |
-| [Shopify Theme Lab](https://github.com/uicrooks/shopify-theme-lab) | <img src="https://img.shields.io/github/package-json/v/uicrooks/shopify-theme-lab?color=%236e78ff"> | Modular development environment for blazing-fast Shopify theming |
-| [Shopify Foundation Theme](https://github.com/uicrooks/shopify-foundation-theme) | <img src="https://img.shields.io/github/package-json/v/uicrooks/shopify-foundation-theme?color=%236e78ff"> | A modern Shopify starter theme built with Vue and Tailwind CSS |
-| [Shopify Theme Lab Plugins](https://github.com/uicrooks/shopify-theme-lab-plugins) | <img src="https://img.shields.io/static/v1?label=version&message=misc&color=%236e78ff"> | Official Shopify Theme Lab plugins |
-<!-- ecosystem (end) -->
+| Command       | Purpose           | Notes  |
+| ------------- |:-------------:| :-----:|
+| `npm run dev`   | Develop with local dev server with live reload| See [Development Themes](https://shopify.dev/docs/themes/tools/cli#development-themes) |
+| `npm run deploy`     | Build and push to production environment theme (interactive)      | Command produces a menu to choose theme and confirm. This CAN overwrite the live theme! |
+| `npm run deploy:dev` | Build and push to development environment theme (non-interactive)     | Uses **shopify.theme.toml** config |
+| `npm run deploy:staging` | Build and push to staging environment theme (non-interactive)  | Does overrite remote themes section/theme content |
+| `npm run deploy:new` | Build and publish to new theme on Shopify (interactive) |     |
 
-<!-- contributing (start) -->
-## Contributing
+For all other NPM scripts and Shopify CLI theme commands reference **package.json** and [Shopify CLI commands for themes](https://shopify.dev/docs/themes/tools/cli/commands)
 
-Everyone is welcome to make Shopify theme development better! Please read the [Contributing guide](.github/CONTRIBUTING.md) before creating issues or submitting pull requests.
-<!-- contributing (end) -->
+## Vite
+Slayed uses [Vite](https://vitejs.dev/) and the [Shopify Vite Plugin](https://github.com/barrel/shopify-vite) and uses the Shopify Vite Plugin default directory locations except for rendering the generated snippet `vite-tag.liquid` as `vite.liquid`.
+
+## CSS
+
+The standard Tailwind boilerplate is provided.
+
+Additionally, **src/css/global.css** can be used for global styles and is not tree-shaken. Layers and @apply can also be used in this file. This is made possible via [@tailwindcss/nesting](https://www.npmjs.com/package/@tailwindcss/nesting).
+
+## Javascript
+
+### Alpine.js
+[Alpine.js](https://alpinejs.dev/start-here) is included and Alpine magic properties, components, stores, and directives directories exist in **frontend/alpine**. The modules are auto-registered within **frontend/alpine/index.js**. Reference **frontend/alpine/components/dropdown.js** to see an example of how to export your module.
+
+> By no means do you need to register your Alpine components in this way, and to reduce bundle size it would be advantageous to register components within a section or snippet.
+
+## Public Directory
+The **public** directory in the project root is a [Vite convention](https://vitejs.dev/guide/assets.html#the-public-directory) for placing your static assets. The *vite-plugin-shopify* Vite plugin moves these static files over to the **assets** on build, so you can serve them up just as you would if you placed them in **assets**. 
+
+## Included Goodies
+
+### Liquid Ajax Cart
+[Liquid Ajax Cart]() library is installed and its directives are used throughout the Slayed sections. With the help of Liquid Ajax Cart you have an out-of-the-box working AJAX cart, aka "minicart".
+
+> Slayed uses v2 of Liquid Ajax Cart which has slightly different API than v1. See [differences-from-v1](https://liquid-ajax-cart.js.org/v2/differences-from-v1/)
+
+### Predictive Search
+The Shopify provided predictive search is already included and just needed to be enabled in the themes customizer. To prevent it from being rendered remove the reference from **theme.liquid**.
+
+### Prodify
+Prodify is a Slayed rework of the Shopify Dawn theme's custom element logic for handling variant changes, **HATEOAS**-style content swapping, and more.
+
+The Prodify script is dynamically imported on the product template within **frontend/entrypoints/theme.js**.
