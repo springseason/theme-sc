@@ -1,8 +1,8 @@
 {
-  "name": "vite-tailwind-alpinejs",
-  "description": "A fork of Shopify Theme lab using Vite instead of Webpack and Alpine.js in place of Vue.js",
-  "author": "James Auble",
-  "version": "1.0.0",
+  "name": "theme-builder-sourcherry",
+  "description": "Shopify liquid theme builder with vite, alpine, tailwind and much more.",
+  "author": "komisz",
+  "version": "0.0.1.",
   "license": "MIT",
   "type": "module",
   "scripts": {
@@ -11,7 +11,7 @@
     "deploy": "run-s vite:build && shopify theme push -e production",
     "deploy:dev": "run-s vite:build && shopify theme push -e development",
     "deploy:staging": "run-s vite:build && shopify theme push --path shopify -e staging",
-    "deploy:new": "run-s vite:build && shopify theme push --unpublished",
+    "deploy:new": "run-s vite:build && shopify theme push --store='mg-test-store-999' --unpublished",
     "vite:watch": "cross-env NODE_ENV=development vite -l info",
     "vite:build": "cross-env NODE_ENV=production vite build",
     "shopify:dev": "shopify theme dev --live-reload full-page --notify /tmp/theme.update --theme-editor-sync -e development",
